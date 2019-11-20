@@ -1,0 +1,455 @@
+# -*- coding: utf-8 -*-
+#This version is MiRo 3.0, and it is designed for off-board deployment
+
+#This is the main control module for this system. 
+#All commands will be processed in this node, we have
+# several nodes in this system, such as image processing node,
+# detector node, neural network node and safety control node.
+#Navigation node can be considered at the end. 
+
+
+
+import os
+import sys
+import rospy
+import sensor_msgs
+import std_msgs
+import geometry_msgs
+import pars 
+import multiprocessing as mp
+import time
+
+#这里导入的包，是这个client的所有必要的参数和功能包。
+# support
+#import pars #注意这个pars的包内包含的所有的机器人的传感器相关的参数。
+import miro2 as miro
+from cv_bridge import CvBridge #使用CvBridge进行opencv和ros的图像信息进行转换。
+# from node_image_processing import *
+from node_detector import *
+from kc_initiate import *
+from node_path_planning import *
+from data_resolver import *
+from node_direction_keeper import *
+from node_tracker import *
+from node_CNN_detector import *
+from node_multitracker import *
+from safety_control import * 
+import matplotlib.pyplot as plt
+
+class ControlNode:
+	def __init__(self, name):
+		# global topic_root
+		self.pars = pars.CorePars()
+		# robot name
+		# topic_root = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
+		topic_root = "/" + name + "/"
+		self.is_activated = True
+		#create the standard camera model
+		#self.cam = miro.utils.camera_model.CameraModel()
+
+		# this needs to be set based on the actual frame size, which
+		# can be obtained from the camera frame topic. Here, we just
+		# assume the default frame size is in use. The default size is (640,360)
+
+		#Initinalize some essential instances
+		self.kc = Kc_init(topic_root)
+
+		self.detector = NormalDetector(topic_root)
+		
+		self.path = PathPlanner(topic_root)
+
+		self.tracker = Tracker(topic_root)
+
+		self.multiTracker = MultiTracker(topic_root)
+
+		self.direction_keeper = DirectionKeeper(topic_root)
+
+		self.NN_detector = NN_detector(topic_root)
+
+		self.safety_controller = SafetyController(topic_root)
+
+	def init_balls_detection_l(self):
+		bbox, output = self.detector.detect_balls_l("#0000FF")
+		return bbox, output
+		
+	def init_balls_detection_r(self):
+		bbox, output = self.detector.detect_balls_r("#0000FF")
+		return bbox, output
+
+	#Pick a color you want to detect, sometimes exterior light source will affect the detection
+	def init_ball_detection_l(self):#0000FF #DE3163 #DC143C #E32636 #FF4D00 
+		bbox, output = self.detector.detect_ball_l("#0000FF")
+		return bbox, output
+		
+	def init_ball_detection_r(self):
+		bbox, output = self.detector.detect_ball_r("#0000FF")
+		return bbox, output
+
+	def init_tracker_s(self,bbox,image,is_left):
+		angular_vel , angle_lst  = self.tracker.tracking_motion_s(bbox, image, is_left)
+		return angular_vel , angle_lst
+
+	def init_tracker(self,l_bbox, r_bbox,l_output, r_output):
+		l_angle_lst , r_angle_lst, r_angular_vel, l_angular_vel = self.tracker.tracking_motion(l_bbox, r_bbox,l_output, r_output)
+		return l_angle_lst , r_angle_lst, r_angular_vel, l_angular_vel
+
+	def init_multi_tracker(self,bbox_lst,cam_index):
+		self.multiTracker.multitracking_motion(bbox_lst,cam_index)
+
+	def init_multi_tracker_s(self,cam_index):
+		self.multiTracker.multitracking_motion_s(cam_index)
+
+	def init_miro_detection_l(self):
+		bbox_lst_l , outputl = self.detector.detect_MIRO_l()
+		return bbox_lst_l , outputl
+
+	def init_miro_detection_r(self):
+		bbox_lst_r , outputr = self.detector.detect_MIRO_r()
+		return bbox_lst_r , outputr
+
+	def init_pedestrain_detection(self):
+		self.detector.detect_pedestrian()
+	
+	def init_movement_detection(self):
+		self.detector.detect_movement()
+
+	def init_kinematic(self):
+		self.kc.init_kc()
+
+	def init_path_planning(self):
+		self.path.loop()
+
+	#This module will not be used in the system, I want to design a combined face detection and identification algorithm.
+	#TODO create a function for face detection and face identification
+	def init_match_target(self):
+		# self.detector.detect_match_target()
+		self.detector.get_match_template(True)
+
+	def init_safety_controller(self):
+		self.is_activated = self.safety_controller.sonar_control(0.15)
+		return self.is_activated
+
+	"""The following functions are some neural network models can be used and tested in this system.
+	Some functions are still in the testing stage, I will use a stable model in the following main function later.
+	"""
+	def init_NN_detection_caffe_l(self):
+		bbox, output = self.NN_detector.detect_targets_caffe('../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.prototxt.txt', '../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.caffemodel',True)
+		return bbox, output
+	def init_NN_detection_caffe_r(self):
+		bbox, output = self.NN_detector.detect_targets_caffe('../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.prototxt.txt', '../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.caffemodel',False)
+		return bbox, output	
+	def init_NN_detection_squeeze_l(self):
+		bbox, output = self.NN_detector.detect_targets_caffe('../lib/squeezenet_v1.1/deploy.prototxt.txt', '../lib/squeezenet_v1.1/squeezenet_v1.1.caffemodel',True)
+		return bbox, output
+	def init_NN_detection_squeeze_r(self):
+		bbox, output = self.NN_detector.detect_targets_caffe('../lib/squeezenet_v1.1/deploy.prototxt.txt', '../lib/squeezenet_v1.1/squeezenet_v1.1.caffemodel',False)
+		return bbox, output	
+	def init_NN_detection_YOLO_l(self):
+		bbox, output = self.NN_detector.detect_targets_darknet('../lib/YOLO_v3/yolov3.cfg', '../lib/YOLO_v3/yolov3.weights',True)
+		return bbox, output
+	def init_NN_detection_YOLO_r(self):
+		bbox, output = self.NN_detector.detect_targets_darknet('../lib/YOLO_v3/yolov3.cfg', '../lib/YOLO_v3/yolov3.weights',False)
+		return bbox, output	
+	def init_NN_detection_tensorflow_mobile_ssd_v1_l(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/ssd_mobilenet_v1/frozen_inference_graph.pb', '../lib/ssd_mobilenet_v1/graph.pbtxt',True)
+		return bbox, output	
+	def init_NN_detection_tensorflow_mobile_ssd_v1_r(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/ssd_mobilenet_v1/frozen_inference_graph.pb', '../lib/ssd_mobilenet_v1/graph.pbtxt',False)
+		return bbox, output
+	def init_NN_detection_tensorflow_mobile_ssd_v2_l(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/ssd_mobilenet_v2/frozen_inference_graph.pb', '../lib/ssd_mobilenet_v2/graph.pbtxt.txt',True)
+		return bbox, output
+	def init_NN_detection_tensorflow_mobile_ssd_v2_r(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/ssd_mobilenet_v2/frozen_inference_graph.pb', '../lib/ssd_mobilenet_v2/graph.pbtxt.txt',False)
+		return bbox, output
+	def init_NN_detection_tensorflow_mask_rcnn_l(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/mask_rcnn_inception_v2/frozen_inference_graph.pb', '../lib/mask_rcnn_inception_v2/graph.pbtxt', True)		
+		return bbox, output	
+	def init_NN_detection_tensorflow_mask_rcnn_r(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/mask_rcnn_inception_v2/frozen_inference_graph.pb', '../lib/mask_rcnn_inception_v2/graph.pbtxt', False)	
+		return bbox, output	
+	def init_NN_detection_tensorflow_faster_rcnn_resnet_l(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/faster_rcnn_resnet101/frozen_inference_graph.pb', '../lib/faster_rcnn_resnet101/graph.pbtxt',True)
+		return bbox, output	
+	def init_NN_detection_tensorflow_faster_rcnn_resnet_r(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/faster_rcnn_resnet101/frozen_inference_graph.pb', '../lib/faster_rcnn_resnet101/graph.pbtxt',False)
+		return bbox, output
+	def init_NN_detection_tensorflow_faster_rcnn_resnet50_l(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/faster_rcnn_resnet50/frozen_inference_graph.pb', '../lib/faster_rcnn_resnet50/graph.pbtxt',True)
+		return bbox, output	
+	def init_NN_detection_tensorflow_faster_rcnn_resnet50_r(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow('../lib/faster_rcnn_resnet50/frozen_inference_graph.pb', '../lib/faster_rcnn_resnet50/graph.pbtxt',False)
+		return bbox, output
+	def init_NN_detection_tensorflow_mobile_ssd_v1_l_s(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow_s('../lib/ssd_mobilenet_v1/frozen_inference_graph.pb', '../lib/ssd_mobilenet_v1/graph.pbtxt',True)
+		return bbox, output
+	def init_NN_detection_tensorflow_mobile_ssd_v1_r_s(self):
+		bbox, output = self.NN_detector.detect_targets_tensorflow_s('../lib/ssd_mobilenet_v1/frozen_inference_graph.pb', '../lib/ssd_mobilenet_v1/graph.pbtxt',False)
+		return bbox, output
+
+	def test(self):
+		self.path.init_pos()
+
+	# try to use multiprocess to make the code more efficient, multi process or thread can be
+	# a way to improve the efficiency. For testers, just ignore these parts
+	# def multiprocess_ball(self):
+	# 	pool = mp.Pool(processes=3)
+	# 	# l_ball = pool.apply_async(self.init_ball_detection_l)
+	# 	# r_ball = pool.apply_async(self.init_ball_detection_r )
+	# 	l_c_pixel = pool.map(self.init_ball_detection_l,range(10))
+	# 	# r_c_pixel, r_ball = pool.map(self.init_ball_detection_r,range(1))
+	# 	# l_ball = l_ball.get()
+	# 	# r_ball = r_ball.get()
+	# 	return l_c_pixel
+
+
+
+# The main function of this control system
+if __name__ == "__main__":
+	# init ROS
+	rospy.init_node(os.getenv("MIRO_ROBOT_NAME") + "_client_demo") #, log_level=self.pars.ros.log_level
+	print os.getenv("MIRO_ROBOT_NAME") + "_client_demo"
+	#self.topic_base_name = "/" + self.pars.ros.robot_name + "/
+	main = ControlNode("miro")
+
+	#Initiate the kinematic status of MiRo
+	main.init_kinematic()
+
+	# ######################################################################## #
+	# Module Test codes, after all modules have been tested, we can integrate  #
+	# them into the main client module.										   #
+	#########################################################################  #
+
+	# main.init_movement_detection()
+	# main.init_pedestrain_detection()
+	# main.init_NN_detection_caffe_l()
+	# main.init_NN_detection_tensorflow_mask_rcnn_l()
+	# main.init_NN_detection_tensorflow_mobile_ssd_v2_l()
+	# main.init_NN_detection_tensorflow_mobile_ssd_v1_l()
+	# main.init_match_target()
+	# main.test()
+	# main.init_path_planning()
+	# main.multiprocess_ball()
+	# main.init_miro_detection_l()
+	# main.init_ball_detection_l()
+	# main.init_ball_detection_r()
+
+	# MiRo detection and ball detection modules using normal opencv APIs
+	# Single target to be tracked. If you only want to track one target,
+	# you can use this code part, here I only use the ball detection module.
+	# As in the simulator, ball detection owns the best effect, we can easily
+	# find how the whole system works. I leave this code section here for testing.
+	# Here we need a loop to intiate this dynamic system.
+	# l_bbox = ()
+	# r_bbox = ()
+	# ball_l_bbox_lst= []
+	# ball_r_bbox_lst= []
+	# angular_vel = []
+	# angle_lst = []
+	data_resolver =DataResolver()
+
+	for i in range(10):
+	# # while main.is_activated ==True:
+	# # main.is_activated = main.init_safety_controller()
+		miro_l_bbox_lst, l_output = main.init_miro_detection_l()
+		miro_r_bbox_lst, r_output = main.init_miro_detection_r()
+
+		# ball_l_bbox_lst, l_output = main.init_ball_detection_l()
+		# ball_r_bbox_lst, r_output= main.init_ball_detection_r()
+		
+	# 	# for x in ball_l_bbox_lst:
+	# 	# 	if len(x)==0:
+	# 	# 		ball_l_bbox_lst.remove(x)
+
+	# 	#clean up null tuples in the list
+		# print "ball_r_bbox_lst", ball_r_bbox_lst
+		# print "ball_l_bbox_lst", ball_l_bbox_lst
+		# ball_l_bbox_lst = [x for x in ball_l_bbox_lst if x]
+		# ball_r_bbox_lst = [x for x in ball_r_bbox_lst if x]
+
+		ball_l_bbox_lst = [x for x in miro_l_bbox_lst if x]
+		ball_r_bbox_lst = [x for x in miro_r_bbox_lst if x]
+
+		if len(ball_r_bbox_lst) != 0 and len(ball_l_bbox_lst) != 0:
+			r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
+			l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
+			l_angle_lst , r_angle_lst, r_angular_vel, l_angular_vel = main.init_tracker(l_bbox, r_bbox,l_output, r_output)
+
+		elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) != 0:
+			print("No targets at the right side, activate tracking left side.")
+			l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
+			angular_vel , angle_lst = main.init_tracker_s(l_bbox, l_output, 0)
+
+		elif len(ball_r_bbox_lst) !=0 and len(ball_l_bbox_lst) == 0:
+			print("No targets at the left side, activate tracking right side.")	
+			r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
+			angular_vel , angle_lst = main.init_tracker_s(r_bbox, r_output, 1)
+
+		elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) == 0:
+			print("No targets at two sides.")
+	# print "angle_lst" ,angle_lst
+	# print "angular_vel", angular_vel
+		if main.is_activated != True:
+			print "Too close!!!"
+			break
+
+	# neg_
+	fig = plt.figure()
+	ax1 = fig.add_subplot(1,2,1)
+	ax1.plot(angle_lst,angular_vel,':')
+	plt.show()
+	
+
+	#Pedestrian detection module using different Neural Network models 
+	#This code part is aimed at using Neural Network for pedestrian detection.
+	# for i in range(100):
+	# while True:
+		# l_bbox, l_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet_l()
+		# r_bbox, r_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet_r()
+		# l_bbox, l_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet50_l()
+		# r_bbox, r_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet50_r()
+		# l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_l_s()
+		# r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_r_s()
+		# l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_l()
+		# r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_r()
+		# l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_l()
+		# r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_r()
+		# l_bbox, l_output = main.init_NN_detection_tensorflow_mask_rcnn_l()
+		# r_bbox, r_output = main.init_NN_detection_tensorflow_mask_rcnn_r()
+		# r_bbox, r_output = main.init_NN_detection_caffe_r()
+		# l_bbox, l_output = main.init_NN_detection_caffe_l()
+		# r_bbox, r_output = main.init_NN_detection_squeeze_l()
+		# l_bbox, l_output = main.init_NN_detection_squeeze_r()
+		# r_bbox, r_output = main.init_NN_detection_YOLO_l()
+		# l_bbox, l_output = main.init_NN_detection_YOLO_r()
+
+		# if l_bbox or r_bbox is not None:
+		# 	if len(r_bbox) != 0 and len(l_bbox) != 0:
+		# 		main.init_tracker(l_bbox, r_bbox,l_output, r_output)
+
+		# 	elif len(r_bbox) == 0 and len(l_bbox) != 0:
+		# 		print("No targets at the right side, activate tracking left side.")
+		# 		main.init_tracker_s(l_bbox, l_output, 0)
+
+		# 	elif len(r_bbox) !=0 and len(l_bbox) == 0:
+		# 		print("No targets at the left side, activate tracking right side.")	
+		# 		main.init_tracker_s(r_bbox, r_output, 1)
+
+		# 	elif len(r_bbox) == 0 and len(l_bbox) == 0: 
+		# 		print("No targets at two sides.")
+		# elif l_bbox and r_bbox is None:
+		# 	print "No data from the detection module."
+	###########################################################################
+	###########################################################################
+
+	# MultiTracking module, this code part integrate all modules above to implement 
+	# the whole autonomous system
+	# This is the code part of detecting and tracking, I set a limited loop here 
+	# the loop can be killed by esc key
+	# l_bbox = ()
+	# r_bbox = ()
+	# l_bbox_lst = []
+	# r_bbox_lst = []
+
+	# for i in range(100):
+	# 	data_resolver =DataResolver()
+	# 	#All results from the Ball detection module
+	# 	ball_l_bbox_lst, l_output = main.init_ball_detection_l()
+	# 	ball_r_bbox_lst, r_output= main.init_ball_detection_r()
+	# 	#All results from the MiRo detection module
+	# 	miro_l_bbox_lst, l_output = main.init_miro_detection_l()
+	# 	miro_r_bbox_lst, r_output = main.init_miro_detection_r()
+	# 	#All results from the Pedestrian detection module
+	# 	pedestrian_l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_l()
+	# 	pedestrian_r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_r()
+
+	# 	#As I collect two results of the ball bounding box, here might be some None value when
+	# 	# there are no balls be detected, cleaning out some null value if there are.
+	# 	ball_l_bbox_lst = [x for x in ball_l_bbox_lst if x]
+	# 	ball_r_bbox_lst = [x for x in ball_r_bbox_lst if x]
+
+	# 	miro_l_bbox_lst = [x for x in miro_l_bbox_lst if x]
+	# 	miro_r_bbox_lst = [x for x in miro_r_bbox_lst if x]
+
+	# 	if ball_r_bbox_lst or ball_l_bbox_lst is not None:
+	# 		if len(ball_r_bbox_lst) != 0 and len(ball_l_bbox_lst) != 0:
+	# 			r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
+	# 			l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
+
+	# 			l_bbox_lst.append(l_bbox)
+	# 			r_bbox_lst.append(r_bbox)
+
+	# 		elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) != 0:
+	# 			print("No  balls at the right side, activate tracking left side.")
+	# 			l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
+	# 			l_bbox_lst.append(l_bbox)
+				
+	# 		elif len(ball_r_bbox_lst) !=0 and len(ball_l_bbox_lst) == 0:
+	# 			print("No  balls at the left side, activate tracking right side.")	
+	# 			r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
+	# 			r_bbox_lst.append(r_bbox)
+
+	# 		elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) == 0: 
+	# 			print("No  balls at two sides.")
+	# 	elif ball_r_bbox_lst and ball_l_bbox_lst is None:
+	# 		print "No data from the ball detection module."
+	# 	print "l_bbox.",l_bbox_lst
+	# 	print "r_bbox.",r_bbox_lst
+
+
+	# 	if miro_r_bbox_lst or miro_l_bbox_lst is not None:
+	# 		if len(miro_r_bbox_lst) != 0 and len(miro_l_bbox_lst) != 0:
+	# 			r_bbox = data_resolver.box_resolver(miro_r_bbox_lst)
+	# 			l_bbox = data_resolver.box_resolver(miro_l_bbox_lst)
+	# 			l_bbox_lst.append(l_bbox)
+	# 			r_bbox_lst.append(r_bbox)
+				
+	# 		elif len(miro_r_bbox_lst) == 0 and len(miro_l_bbox_lst) != 0:
+	# 			print("No miro robots at the right side, activate tracking left side.")
+	# 			l_bbox = data_resolver.box_resolver(miro_l_bbox_lst)
+	# 			l_bbox_lst.append(l_bbox)
+
+	# 		elif len(miro_r_bbox_lst) !=0 and len(miro_l_bbox_lst) == 0:
+	# 			print("No  miro robots at the left side, activate tracking right side.")	
+	# 			r_bbox = data_resolver.box_resolver(miro_r_bbox_lst)
+	# 			r_bbox_lst.append(r_bbox)
+
+	# 		elif len(miro_r_bbox_lst) == 0 and len(miro_l_bbox_lst) == 0: 
+	# 			print("No  miro robots at two sides.")
+	# 	elif miro_r_bbox_lst and miro_l_bbox_lst is None:
+	# 		print "No data from the miro detection module."
+	# 	print "l_bbox..",l_bbox_lst
+	# 	print "r_bbox..",r_bbox_lst
+
+
+	# 	if pedestrian_l_bbox or pedestrian_r_bbox is not None:
+	# 		if len(pedestrian_r_bbox) != 0 and len(pedestrian_l_bbox) != 0:
+	# 			l_bbox_lst.append(pedestrian_l_bbox)
+	# 			r_bbox_lst.append(pedestrian_r_bbox)
+
+	# 		elif len(pedestrian_r_bbox) == 0 and len(pedestrian_l_bbox) != 0:
+	# 			print("No targets at the right side, activate tracking left side.")
+	# 			l_bbox_lst.append(pedestrian_l_bbox)
+
+	# 		elif len(pedestrian_r_bbox) !=0 and len(pedestrian_l_bbox) == 0:
+	# 			print("No targets at the left side, activate tracking right side.")	
+	# 			r_bbox_lst.append(pedestrian_r_bbox)
+
+	# 		elif len(pedestrian_r_bbox) == 0 and len(pedestrian_l_bbox) == 0: 
+	# 			print("No targets at two sides.")
+				
+	# 	elif pedestrian_l_bbox and pedestrian_r_bbox is None:
+	# 		print "No data from the detection module."
+	# 	print "l_bbox...",l_bbox_lst
+	# 	print "r_bbox...",r_bbox_lst
+
+
+
+	# 	main.init_multi_tracker(l_bbox_lst,1)
+	# 	main.init_multi_tracker(r_bbox_lst,0)
+	# main.init_multi_tracker_s(1)
+	# main.init_multi_tracker_s(0)
+
+
+
+
