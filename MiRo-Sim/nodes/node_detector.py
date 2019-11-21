@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
-#This is the module for detecting all targets, different functions based on different algorithms to 
+#This is the module for detecting all targets, different functions based on various algorithms to 
 #implement a detection module.
 ## MIRO进行行人检测的部分样例代码。使用HOG + SVM进行行人检测，分类，这个精度估计不是很高
 #后期需要进行negative 的样本的调整。
@@ -12,16 +12,17 @@ import time
 from std_msgs.msg import Float32MultiArray, UInt32MultiArray, UInt16MultiArray, UInt8MultiArray, UInt16, Int16MultiArray
 from geometry_msgs.msg import TwistStamped, Vector3
 from sensor_msgs.msg import JointState, BatteryState, Imu, Range, CompressedImage, Image
+
 # Open CV
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-
 import numpy as np
 #from matplotlib import pyplot as plt
 from transform import *
 
 
-"""Using normal OpenCV APIs to implement detection modules"""
+"""Using normal OpenCV APIs to implement detection modules, so I call it Normal detector, and there is another
+modeule called CNN detector, this module will use neural network models to implement detections."""
 class NormalDetector:
 
 	def __init__ (self,name):
@@ -31,6 +32,7 @@ class NormalDetector:
 		self.frame_w = 0
 		self.frame_h = 0
 		# self.cam_model.set_frame_size(640, 320)
+		
 		# Subscribe to sensors
 		#self.sensors_sub = rospy.Subscriber(self.topic_root + "sensors/package", miro.msg.sensors_package, self.sensors_callback)
 		self.counter_left = 0 
@@ -104,9 +106,10 @@ class NormalDetector:
 			else:
 				print("I cannot find any MiRo robots on the left side!")
 				pass
+			bbox_lst_l.append(bbox)
+			#For testing only
 			# cv2.imshow("left_tracking", outputl)
 			# cv2.imshow("gray_l", gray_l)
-			bbox_lst_l.append(bbox)
 			# if cv2.waitKey(0)&0xff == 27:
 			# 	cv2.destroyAllWindows()
 			# 	break
@@ -152,8 +155,8 @@ class NormalDetector:
 			else:
 				print("I cannot find any MiRo robots on the right side!")
 				pass
-			# cv2.imshow("right_tracking", outputr)
 			bbox_lst_r.append(bbox)
+			# cv2.imshow("right_tracking", outputr)
 			# if cv2.waitKey(1)&0xff == 27:
 			# 	cv2.destroyAllWindows()	    # esc键
 			# 	break
@@ -164,7 +167,7 @@ class NormalDetector:
 		cv2.destroyAllWindows()	
 		return  bbox_lst_r, outputr
 
-#This is the function which is aimed at detecting the pedestrian. The algorithm I used here is HOG and SVM.
+	#This is the function which is aimed at detecting the pedestrian. The algorithm I used here is HOG and SVM.
 	def detect_pedestrian(self):
 		count = 0
 		pedestrian_pos_l = []
@@ -173,7 +176,7 @@ class NormalDetector:
 		ROI_r = []
 		hog = cv2.HOGDescriptor()
 		#load the trained bin file
-		hog.load('../nodes/myHogDector.bin')
+		hog.load('../bin/pedestrian_bin/myHogDector.bin')
 		# pedestrian_cascade = cv2.CascadeClassifier('/home/lizheng/Documents/MIRO_demos/Demo/bin/myHogDector.bin')
 		while True:
 			if self.cam_right_callback != None:
@@ -182,8 +185,8 @@ class NormalDetector:
 			if self.cam_left_callback != None:
 				time.sleep(0.1)
 				outputl = self.cam_left_image.copy()
-			rects_l, wei = hog.detectMultiScale(outputr, winStride=(4, 4),padding=(8, 8), scale=1.05)
-			rects_r, wei = hog.detectMultiScale(outputl, winStride=(4, 4),padding=(8, 8), scale=1.05)
+			rects_l, wei = hog.detectMultiScale(outputl, winStride=(4, 4),padding=(8, 8), scale=1.05)
+			rects_r, wei = hog.detectMultiScale(outputr, winStride=(4, 4),padding=(8, 8), scale=1.05)
 			# rects_l = pedestrian_cascade.detectMultiScale(outputr, winStride=(4, 4),padding=(8, 8), scale=1.05)
 			# rects_r = pedestrian_cascade.detectMultiScale(outputl, winStride=(4, 4),padding=(8, 8), scale=1.05)
 			for (x, y, w, h) in rects_l:
@@ -219,12 +222,12 @@ class NormalDetector:
 				# 	print(self.counter_right)
 				pedestrian_pos_r.append(pedestrian_pos_r)
 			# cv2.imshow('right', outputr)
+
 		# 	count += 1
 		# 	if cv2.waitKey(1)&0xff == 27:    # esc键
 		# 		break
 		# cv2.destroyAllWindows()
 		# return pedestrian_pos_l, ROI_l,pedestrian_pos_r,ROI_r
-
 
 	#take photos of the ROI, and write them into the folder
 	def shot(self,pos, frame,flag):
@@ -235,120 +238,6 @@ class NormalDetector:
 			path = self.folder+"/" + pos + "_" + str(self.counter_right) + ".jpg"
 		cv2.imwrite(path, frame)
 		print("snapshot saved into: " + path)
-
-
-	#This method use a differnet method to detect the movement frames by frame,
-	#the result contains all pixels' movements.
-	def detect_movement_info(self):
-		time.sleep(0.1)
-		outputr = self.cam_right_image.copy()
-		time.sleep(0.1)
-		outputl = self.cam_left_image.copy()
-		prvs = cv2.cvtColor(outputl,cv2.COLOR_BGR2GRAY)
-		hsv = np.zeros_like(outputl)
-
-		#遍历每一行的第1列
-		hsv[...,1] = 255
-
-
-		while(1):
-			time.sleep(1)
-			outputl = self.cam_left_image.copy()
-			next = cv2.cvtColor(outputl,cv2.COLOR_BGR2GRAY)
-
-			#返回一个两通道的光流向量，实际上是每个点的像素位移值,
-			flow = cv2.calcOpticalFlowFarneback(prvs,next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-
-			#print(flow.shape)
-			print(flow)
-
-			#笛卡尔坐标转换为极坐标，获得极轴和极角
-			mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
-			hsv[...,0] = ang*180/np.pi/2
-			hsv[...,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
-			rgb = cv2.cvtCdetect_movement_infoolor(hsv,cv2.COLOR_HSV2BGR)
-			print(rgb.shape)
-			cv2.imshow('frame2',rgb)
-			k = cv2.waitKey(30) & 0xff
-			if k == 27:
-				break
-			#if you want to save a sample of the optical flow and hsv format picture
-			elif k == ord('s'):
-				cv2.imwrite('opticalfb.png',hsv)
-				cv2.imwrite('opticalhsv.png',rgb)
-			prvs = next
-
-		cv2.destroyAllWindows()
-	
-	#This function uses ShiTomasi and  lucas kanade to get some movements in 
-	#a frame, in this case, we can limit the detection region.
-	def detect_movement(self):
-
-		time.sleep(0.1)
-		outputr = self.cam_right_image.copy()
-		time.sleep(0.1)
-		outputl = self.cam_left_image.copy()
-
-		# ShiTomasi 角点检测参数
-		feature_params = dict( maxCorners = 100,
-							   qualityLevel = 0.3,
-							   minDistance = 7,
-							   blockSize = 7 )
-
-		# lucas kanade光流法参数
-		lk_params = dict( winSize  = (15,15),
-						  maxLevel = 2,
-						  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
-
-		# 创建随机颜色
-		color = np.random.randint(0,255,(100,3))
-
-		# 获取第一帧，找到角点
-		old_frame = outputl
-		#找到原始灰度图
-		old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
-
-		#获取图像中的角点，返回到p0中
-		p0 = cv2.goodFeaturesToTrack(old_gray, mask = None, **feature_params)
-		print("p0------->:",p0)
-		# 创建一个蒙版用来画轨迹
-		mask = np.zeros_like(old_frame)
-
-		while True:
-			time.sleep(0.1)
-			frame = self.cam_left_image.copy()
-			frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-			# 计算光流
-			p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
-			#print ("new point:",p1[st==1])
-			#print("old point:",p0[st==1])
-			# 选取好的跟踪点
-			good_new = p1[st==1]
-			good_old = p0[st==1]
-
-			# 画出轨迹
-			for i,(new,old) in enumerate(zip(good_new,good_old)):
-				a,b = new.ravel()
-				c,d = old.ravel()
-				mask = cv2.line(mask, (a,b),(c,d), color[i].tolist(), 2)
-				frame = cv2.circle(frame,(a,b),5,color[i].tolist(),-1)
-			img = cv2.add(frame,mask)
-
-			# cv2.imshow('frame',img)
-			k = cv2.waitKey(30) & 0xff
-			if k == 27:
-				break
-
-			# 更新上一帧的图像和追踪点
-			old_gray = frame_gray.copy()
-			cv2.imshow("old gray", old_gray)
-			cv2.imshow("frame", frame)
-			p0 = good_new.reshape(-1,1,2)
-			print("old point",p0)
-			#print(str(j)+":", p0)
-			
-		cv2.destroyAllWindows()
 
 	def detect_balls_l(self,colour_str):
 		count = 0
@@ -367,7 +256,6 @@ class NormalDetector:
 
 		if np.shape(self.cam_left_image) == () or np.shape(self.cam_right_image) == ():
 			return
-
 		#create colour code from user selected colour
 		red = int(colour_str[1:3], 16)
 		green = int(colour_str[3:5], 16)
@@ -379,12 +267,13 @@ class NormalDetector:
 		target_hue = hsv_colour[0,0][0]
 		lower_bound = np.array([target_hue-20, 100, 100])
 		upper_bound = np.array([target_hue+20, 255, 255])
+		
 		while True:
 			#get a copy of the raw image without being processed.
 			time.sleep(0.1)
 			outputl = self.cam_left_image.copy()
 			#here is the range of the hsv paramaters we want to pick 
-			time.sleep(0.1)
+			# time.sleep(0.1)
 			hsvl = cv2.cvtColor(outputl, cv2.COLOR_BGR2HSV)
 			#get the image width and height in HSV format, and 
 			#the center coordination of the image. we can assume that 
@@ -729,6 +618,120 @@ class NormalDetector:
 		# cv2.destroyAllWindows()
 		return bbox_lst_l , outputl
 
+
+	#This method use a differnet method to detect the movement frames by frame,
+	#the result contains all pixels' movements.
+	def detect_movement_info(self):
+		time.sleep(0.1)
+		outputr = self.cam_right_image.copy()
+		time.sleep(0.1)
+		outputl = self.cam_left_image.copy()
+		prvs = cv2.cvtColor(outputl,cv2.COLOR_BGR2GRAY)
+		hsv = np.zeros_like(outputl)
+
+		#遍历每一行的第1列
+		hsv[...,1] = 255
+
+		while(1):
+			time.sleep(1)
+			outputl = self.cam_left_image.copy()
+			next = cv2.cvtColor(outputl,cv2.COLOR_BGR2GRAY)
+
+			#返回一个两通道的光流向量，实际上是每个点的像素位移值,
+			flow = cv2.calcOpticalFlowFarneback(prvs,next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+
+			#print(flow.shape)
+			print(flow)
+
+			#笛卡尔坐标转换为极坐标，获得极轴和极角
+			mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
+			hsv[...,0] = ang*180/np.pi/2
+			hsv[...,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
+			rgb = cv2.cvtCdetect_movement_infoolor(hsv,cv2.COLOR_HSV2BGR)
+			print(rgb.shape)
+			cv2.imshow('frame2',rgb)
+			k = cv2.waitKey(30) & 0xff
+			if k == 27:
+				break
+			#if you want to save a sample of the optical flow and hsv format picture
+			elif k == ord('s'):
+				cv2.imwrite('opticalfb.png',hsv)
+				cv2.imwrite('opticalhsv.png',rgb)
+			prvs = next
+
+		cv2.destroyAllWindows()
+	
+	#This function uses ShiTomasi and  lucas kanade to get some movements in 
+	#a frame, in this case, we can limit the detection region.
+	def detect_movement(self):
+
+		time.sleep(0.1)
+		outputr = self.cam_right_image.copy()
+		time.sleep(0.1)
+		outputl = self.cam_left_image.copy()
+
+		# ShiTomasi 角点检测参数
+		feature_params = dict( maxCorners = 100,
+							   qualityLevel = 0.3,
+							   minDistance = 7,
+							   blockSize = 7 )
+
+		# lucas kanade光流法参数
+		lk_params = dict( winSize  = (15,15),
+						  maxLevel = 2,
+						  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
+
+		# 创建随机颜色
+		color = np.random.randint(0,255,(100,3))
+
+		# 获取第一帧，找到角点
+		old_frame = outputl
+		#找到原始灰度图
+		old_gray = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
+
+		#获取图像中的角点，返回到p0中
+		p0 = cv2.goodFeaturesToTrack(old_gray, mask = None, **feature_params)
+		print("p0------->:",p0)
+		# 创建一个蒙版用来画轨迹
+		mask = np.zeros_like(old_frame)
+
+		while True:
+			time.sleep(0.1)
+			frame = self.cam_left_image.copy()
+			frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+			# 计算光流
+			p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
+			#print ("new point:",p1[st==1])
+			#print("old point:",p0[st==1])
+			# 选取好的跟踪点
+			good_new = p1[st==1]
+			good_old = p0[st==1]
+
+			# 画出轨迹
+			for i,(new,old) in enumerate(zip(good_new,good_old)):
+				a,b = new.ravel()
+				c,d = old.ravel()
+				mask = cv2.line(mask, (a,b),(c,d), color[i].tolist(), 2)
+				frame = cv2.circle(frame,(a,b),5,color[i].tolist(),-1)
+			img = cv2.add(frame,mask)
+
+			# cv2.imshow('frame',img)
+			k = cv2.waitKey(30) & 0xff
+			if k == 27:
+				break
+
+			# 更新上一帧的图像和追踪点
+			old_gray = frame_gray.copy()
+			cv2.imshow("old gray", old_gray)
+			cv2.imshow("frame", frame)
+			p0 = good_new.reshape(-1,1,2)
+			print("old point",p0)
+			#print(str(j)+":", p0)
+			
+		cv2.destroyAllWindows()
+
+
 	#This function is desigend for mathcing the user's face, simple way to check the 
 	#identity of people who is using MIRO, after MIRO is activated, it will ask for checking
 	#the face of the user.
@@ -745,8 +748,6 @@ class NormalDetector:
 			# r_pos = self.get_match_template(self.camera.cam_right_image,False)
 		l_pos = self.get_match_template(True)
 		print(l_pos)
-
-		
 		# return 	l_pos, r_pos
 
 	def get_match_template(self,is_left):
