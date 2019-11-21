@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-#This version is MiRo 3.0, and it is designed for off-board deployment
+#This version is MiRo 1.2, and it is designed for off-board deployment or in the simulator.
+#In this system, I used some OpenCV APIs to support several modules. And also applied some 
+#Neural Network models online for pedestrian detection, this will be compared at the accuracy aspect.
 
-#This is the main control module for this system. 
+
+#Here is the main control module for this system. 
 #All commands will be processed in this node, we have
-# several nodes in this system, such as image processing node,
+# several nodes in this system, such as tracker node,
 # detector node, neural network node and safety control node.
 #Navigation node can be considered at the end. 
 
@@ -20,11 +23,13 @@ import multiprocessing as mp
 import time
 
 #这里导入的包，是这个client的所有必要的参数和功能包。
-# support
+#Here I import all basic nodes and their necessary functions to
+# support the control module.
+
 #import pars #注意这个pars的包内包含的所有的机器人的传感器相关的参数。
+# from node_image_processing import * Delete this node, ignore this node.
 import miro2 as miro
 from cv_bridge import CvBridge #使用CvBridge进行opencv和ros的图像信息进行转换。
-# from node_image_processing import *
 from node_detector import *
 from kc_initiate import *
 from node_path_planning import *
@@ -34,24 +39,25 @@ from node_tracker import *
 from node_CNN_detector import *
 from node_multitracker import *
 from safety_control import * 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt # This is a useful package for later painting the diagram. 
 
 class ControlNode:
+
 	def __init__(self, name):
 		# global topic_root
-		self.pars = pars.CorePars()
-		# robot name
+		#self.pars = pars.CorePars()
+		# set the robot name
 		# topic_root = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
 		topic_root = "/" + name + "/"
-		self.is_activated = True
+		self.is_activated = True #The default safety range control is opened, so the default value is True.
+
 		#create the standard camera model
 		#self.cam = miro.utils.camera_model.CameraModel()
-
 		# this needs to be set based on the actual frame size, which
 		# can be obtained from the camera frame topic. Here, we just
 		# assume the default frame size is in use. The default size is (640,360)
 
-		#Initinalize some essential instances
+		#Initinalize some essential instances.
 		self.kc = Kc_init(topic_root)
 
 		self.detector = NormalDetector(topic_root)
@@ -125,12 +131,16 @@ class ControlNode:
 		# self.detector.detect_match_target()
 		self.detector.get_match_template(True)
 
+	#Here is the init of a safety controller with the range 0.15 meter.
 	def init_safety_controller(self):
 		self.is_activated = self.safety_controller.sonar_control(0.15)
 		return self.is_activated
 
+
+
 	"""The following functions are some neural network models can be used and tested in this system.
 	Some functions are still in the testing stage, I will use a stable model in the following main function later.
+	Every camera will initiate the neural network model once. 
 	"""
 	def init_NN_detection_caffe_l(self):
 		bbox, output = self.NN_detector.detect_targets_caffe('../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.prototxt.txt', '../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.caffemodel',True)
@@ -187,6 +197,7 @@ class ControlNode:
 		bbox, output = self.NN_detector.detect_targets_tensorflow_s('../lib/ssd_mobilenet_v1/frozen_inference_graph.pb', '../lib/ssd_mobilenet_v1/graph.pbtxt',False)
 		return bbox, output
 
+	# A function for testing.
 	def test(self):
 		self.path.init_pos()
 
@@ -231,6 +242,7 @@ if __name__ == "__main__":
 	# main.init_path_planning()
 	# main.multiprocess_ball()
 	# main.init_miro_detection_l()
+	# main.init_miro_detection_r()
 	# main.init_ball_detection_l()
 	# main.init_ball_detection_r()
 
@@ -240,6 +252,7 @@ if __name__ == "__main__":
 	# As in the simulator, ball detection owns the best effect, we can easily
 	# find how the whole system works. I leave this code section here for testing.
 	# Here we need a loop to intiate this dynamic system.
+
 	# l_bbox = ()
 	# r_bbox = ()
 	# ball_l_bbox_lst= []
@@ -248,20 +261,24 @@ if __name__ == "__main__":
 	# angle_lst = []
 	data_resolver =DataResolver()
 
+	#Set a loop for the system for testing, if the system is issued, this should be a finite loop.
+	# While (1):
 	for i in range(10):
-	# # while main.is_activated ==True:
-	# # main.is_activated = main.init_safety_controller()
+
+		# while main.is_activated ==True:
+		#This is the safety controller, every time it will check the sonar sensor to judge if the 
+		#the distance between the robot and the target or other objects is less than 0.15,
+		main.is_activated = main.init_safety_controller()
+
+		#MiRo detection
 		miro_l_bbox_lst, l_output = main.init_miro_detection_l()
 		miro_r_bbox_lst, r_output = main.init_miro_detection_r()
 
+		#Ball detection
 		# ball_l_bbox_lst, l_output = main.init_ball_detection_l()
 		# ball_r_bbox_lst, r_output= main.init_ball_detection_r()
-		
-	# 	# for x in ball_l_bbox_lst:
-	# 	# 	if len(x)==0:
-	# 	# 		ball_l_bbox_lst.remove(x)
 
-	# 	#clean up null tuples in the list
+		#clean up null tuples in the list
 		# print "ball_r_bbox_lst", ball_r_bbox_lst
 		# print "ball_l_bbox_lst", ball_l_bbox_lst
 		# ball_l_bbox_lst = [x for x in ball_l_bbox_lst if x]
@@ -287,13 +304,16 @@ if __name__ == "__main__":
 
 		elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) == 0:
 			print("No targets at two sides.")
-	# print "angle_lst" ,angle_lst
-	# print "angular_vel", angular_vel
+		
+		#for testing the controlling module.
+		# print "angle_lst" ,angle_lst
+		# print "angular_vel", angular_vel
+
 		if main.is_activated != True:
 			print "Too close!!!"
 			break
 
-	# neg_
+	# Painting the diagram for viewing the process of angle and angular vel
 	fig = plt.figure()
 	ax1 = fig.add_subplot(1,2,1)
 	ax1.plot(angle_lst,angular_vel,':')
@@ -341,6 +361,9 @@ if __name__ == "__main__":
 		# 	print "No data from the detection module."
 	###########################################################################
 	###########################################################################
+
+
+
 
 	# MultiTracking module, this code part integrate all modules above to implement 
 	# the whole autonomous system
