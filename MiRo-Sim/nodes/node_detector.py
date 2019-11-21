@@ -18,7 +18,7 @@ import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 #from matplotlib import pyplot as plt
-from transform import *
+# from transform import *
 
 
 """Using normal OpenCV APIs to implement detection modules, so I call it Normal detector, and there is another
@@ -45,7 +45,7 @@ class NormalDetector:
 		self.cam_right_image = None
 		# Create objects to convert ROS images to OpenCV format
 		self.image_converter = CvBridge()
-		self.transformer = Transformer(name)
+		# self.transformer = Transformer(name)
 		self.cam_left_sub = rospy.Subscriber(
 			self.topic_root + "sensors/caml/compressed", CompressedImage,  self.cam_left_callback,queue_size=1,buff_size=52428800)
 		self.cam_right_sub = rospy.Subscriber(
