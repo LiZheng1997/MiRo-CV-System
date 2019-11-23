@@ -1,23 +1,18 @@
 import numpy as np
 # import pandas as pd 
 from std_msgs.msg import UInt16
+
 class DataResolver:
 
     def __init__(self):
-        # self.l_arr = left_arr
-        # self.r_arr = right_arr
-        #pick out all none values
+        
         self.arr = []
-        # self.r_arr = []
-        # self.
 
     def avg_resolver(self, arr):
+        #pick out all none values
         self.arr = arr [np.logical_not(np.isnan(arr))]
         # self.r_arr = right_arr [np.logical_not(pd.isnull(right_arr))]
         avg = self.cal_avg(self.arr)
-        # avg_r = self.cal_avg(self.r_arr)
-        # print(avg_l)
-        # print(avg_r)
         return avg
 
     def cal_avg(self,arr):
@@ -26,21 +21,11 @@ class DataResolver:
             [row] = arr.shape
             x_arr = np.array([],dtype=UInt16)
             y_arr = np.array([],dtype=UInt16)
-            # count = 0
-            # sum = 0
             for i in range(row):
                 if i % 2 == 0:
-                    # print("arr[i]:",arr[i])
                     x_arr = np.append(x_arr,arr[i] )
                 else:
-                    # print("arr[i]:",arr[i])
                     y_arr = np.append(y_arr,arr[i] )
-
-                    # count += 1
-                    # sum = sum + arr[i]
-            # avg = int(sum / count)
-            # print("x_arr:",x_arr)
-            # print("y_arr:",y_arr)
         try:
             avg_x = np.mean(x_arr)
             avg_y = np.mean(y_arr)
