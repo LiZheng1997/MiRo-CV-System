@@ -1,3 +1,10 @@
+"""A script for showing how the Kalman Filter works in a picture with mouse.
+This can be a template script for using Kalman Filter to predict the movement of 
+a moving target, also this theory is useful in integrating data from multi-sensors.
+The green line is the actual movement, and the red line is the corrected or predicted
+line.
+"""
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
