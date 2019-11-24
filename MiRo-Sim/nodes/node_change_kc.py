@@ -64,6 +64,7 @@ class ChangeKc:
 
 			joint_radians = math.radians(degrees)
 			self.kin_joints.position[joint_index] = joint_radians
+			
 	#This function can set each cosmetic joint in MIRO, we have 6 joints.
 	#left ear, right ear, left eye , right eye, droop, wag.
 	def set_joint(self, joint_index, pos):
