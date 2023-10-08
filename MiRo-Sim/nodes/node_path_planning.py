@@ -92,7 +92,7 @@ class PathPlanner:
 
 		vel_t = t_move_distance / (now-old_time)
 		if vel_t > 0.4:
-			print "The target's speed is larger than the max speed of robot! "
+			print ("The target's speed is larger than the max speed of robot! ")
 		else:
 			vel_r = 0.4 #m/s
 		print("vel_t:---------------------------------------->",vel_t)
