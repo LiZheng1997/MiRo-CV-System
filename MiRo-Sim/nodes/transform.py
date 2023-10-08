@@ -17,9 +17,9 @@ class Transformer:
 	def __init__(self,name):
 
 		#init a miro camera model
-		self.cam = miro.utils.camera_model.CameraModel()
+		self.cam = miro.lib.camera_model.CameraModel()
 		self.cam.set_frame_size(640, 360)
-		self.kc = miro.utils.kc_interf.kc_miro()
+		self.kc = miro.lib.kc_interf.kc_miro()
 		self.kc_updater = node_change_kc.ChangeKc(name)
 		self.kin_sub = rospy.Subscriber(name + "sensors/kinematic_joints", JointState,self.callback_kin)
 		self.kinematic_joints = JointState()
