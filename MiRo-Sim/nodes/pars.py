@@ -187,8 +187,8 @@ class Lower(object):
 
 #这里还是设定为基础的平台的时间和发送频率。
 		fS = pars.timing.tick_hz
-		self.user_touch_gamma_attack = miro.utils.tau2gamma( self.user_touch_tau_attack, fS )
-		self.user_touch_gamma_release = miro.utils.tau2gamma( self.user_touch_tau_release, fS )
+		self.user_touch_gamma_attack = miro.lib.tau2gamma( self.user_touch_tau_attack, fS )
+		self.user_touch_gamma_release = miro.lib.tau2gamma( self.user_touch_tau_release, fS )
 
 
 
@@ -394,12 +394,12 @@ class Affect(object):
 							self.arousal_audio_level_min )
 
 		fS = pars.timing.tick_hz
-		self.lambda_audio_level_accum = miro.utils.tau2lambda( self.tau_audio_level_accum, fS )
-		self.gamma_neutral_valence_asleep = miro.utils.tau2gamma(self.tau_neutral_valence_asleep, fS)
-		self.gamma_neutral_valence_awake = miro.utils.tau2gamma(self.tau_neutral_valence_awake, fS)
-		self.gamma_mood = miro.utils.tau2gamma(self.tau_mood, fS)
-		self.gamma_emotion = miro.utils.tau2gamma(self.tau_emotion, fS)
-		self.gamma_respond_drive = miro.utils.tau2gamma(self.tau_respond_drive, fS)
+		self.lambda_audio_level_accum = miro.lib.tau2lambda( self.tau_audio_level_accum, fS )
+		self.gamma_neutral_valence_asleep = miro.lib.tau2gamma(self.tau_neutral_valence_asleep, fS)
+		self.gamma_neutral_valence_awake = miro.lib.tau2gamma(self.tau_neutral_valence_awake, fS)
+		self.gamma_mood = miro.lib.tau2gamma(self.tau_mood, fS)
+		self.gamma_emotion = miro.lib.tau2gamma(self.tau_emotion, fS)
+		self.gamma_respond_drive = miro.lib.tau2gamma(self.tau_respond_drive, fS)
 		
 
 
@@ -475,7 +475,7 @@ class CorePars (object):
 
 		#这部分引用了platform pars中的参数定义。也就是平台中最基本也是最重要的参数类型。
 		# import platform pars #调用platformPars中定义的参数
-		platform_pars = miro.utils.platform_pars.PlatformPars()
+		platform_pars = miro.lib.platform_pars.PlatformPars()
 		self.timing = platform_pars.timing #频率时间
 		self.geom = platform_pars.geom #声呐
 		self.camera = platform_pars.camera #立体相机
@@ -614,7 +614,7 @@ class CorePars (object):
 		# do in future if we add more flags).
 		params_filename = import_path + "/platform_parameters"
 		if not os.path.isfile(params_filename):
-			miro.utils.warning("params not found")
+			miro.lib.warning("params not found")
 
 		else:
 			with open(params_filename) as f:
