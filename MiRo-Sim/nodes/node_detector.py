@@ -28,7 +28,7 @@ class NormalDetector:
 	def __init__ (self,name):
 		self.topic_root =  name 
 		#set the default size of the camera
-		self.cam_model = miro.utils.CameraModel()
+		self.cam_model = miro.lib.CameraModel()
 		self.frame_w = 0
 		self.frame_h = 0
 		# self.cam_model.set_frame_size(640, 320)
