@@ -95,7 +95,7 @@ class MultiTracker:
 			time.sleep(0.1)
 			frame = self.cam_right_image.copy()
 		if frame is None:
-			print "no image is readed"
+			print("no image is readed")
 			pass
 		#store three bounding boxes seperately, named pedestrian, miro and ball
 		# only ball bounding box has to be checked for the range of the bounding
