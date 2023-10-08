@@ -155,7 +155,7 @@ class Tracker:
 		while True:
 			self.is_activated = self.safety_controller.sonar_control(0.15)
 			if self.is_activated == False:
-				print "Too close!!!"
+				print ("Too close!!!")
 				break
 			# print("self.pose.x-------->:", self.pose)
 			if cam_index == 0:
@@ -167,7 +167,7 @@ class Tracker:
 				time.sleep(0.1)
 				frame = self.cam_right_image.copy()
 			if frame is None:
-				print "no image is readed"
+				print("no image is readed") 
 				break
 
 			# Start now, calculate the time.
@@ -207,7 +207,7 @@ class Tracker:
 					print("pose-----------------after>",pose)
 
 					spd = np.array(self.sensors_pack.wheel_speed_opto.data)
-					print "spd--->",spd
+					print("spd--->",spd) 
 					twist = self.sensors_pack.odom.twist.twist
 					dr = twist.linear.x
 					dtheta = twist.angular.z
@@ -218,15 +218,15 @@ class Tracker:
 					mes_array = np.array([old_t_pos[0],old_t_pos[1]])
 					self.current_mes =  np.array([[np.float32(mes_array[0])],[np.float32(mes_array[1])]])
 					estimated = self.kalman.correct(self.current_mes)
-					print "corrected estimation from KF",estimated
+					print("corrected estimation from KF",estimated) 
 					self.current_pre = self.kalman.predict()
-					print "Prediciton from Kalman Filter",self.current_pre
+					print("Prediciton from Kalman Filter",self.current_pre) 
 					# print ""
 					#Here is the prediction of the state space, compare the prediction and the Kalman prediction
 					r_pos[0] = r_pos[0] +  vel_r * cos_l * 2.0
 					r_pos[1] = r_pos[1] +  vel_r * sin_l * 2.0
 					pre_array = np.array([r_pos[0],r_pos[1],vel_r * cos_l,vel_r * sin_l])
-					print "Prediction from calculation", pre_array
+					print("Prediction from calculation", pre_array) 
 					print("pose-----------------after>",pose)
 
 					# current_second = datetime.datetime.now().second
@@ -363,7 +363,7 @@ class Tracker:
 		while True:
 			self.is_activated = self.safety_controller.sonar_control(0.15)
 			if self.is_activated == False:
-				print "Too close!!!"
+				print("Too close!!!") 
 				break
 			#get the output of the image from camera
 			time.sleep(0.1)
@@ -372,7 +372,7 @@ class Tracker:
 			time.sleep(0.1)
 			r_frame = self.cam_right_image.copy()
 			if l_frame is None and r_frame is None:
-				print "no image is readed"
+				print("no image is readed") 
 				break
 			# Start now, because we will need the time of updating frames by different
 			#trckers, so we store the time here seperately
