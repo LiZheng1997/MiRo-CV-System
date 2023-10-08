@@ -235,7 +235,7 @@ class Tracker:
 			else :
 				# Tracking failure
 				cv.putText(frame, "Tracking failure detected", (100,80), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-		   		cv2.destroyAllWindows()
+				cv2.destroyAllWindows()
 				break
 			# Display tracker type on frame
 			cv.putText(frame, tracker_type + " Tracker", (100,20), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
