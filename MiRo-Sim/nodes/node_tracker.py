@@ -462,7 +462,7 @@ class Tracker:
 			elif r_ok != True :
 				# Tracking failure
 				cv.putText(r_frame, "Tracking failure detected", (100,80), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-		   		cv2.destroyAllWindows()
+				cv2.destroyAllWindows()
 				break
 			# Display tracker type on r_frame
 			cv.putText(r_frame, r_tracker_type + " Tracker", (100,20), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
