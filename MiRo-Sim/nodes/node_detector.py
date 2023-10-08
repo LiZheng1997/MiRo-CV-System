@@ -326,7 +326,7 @@ class NormalDetector:
 						cv2.putText(outputl, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 3)
 						cv2.putText(outputl, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 			else:
-				print "No balls have been found on the left side."
+				print ("No balls have been found on the left side.")
 				pass
 			# cv2.imshow("outl", outputl)
 			# circle_point = self.pixel_to_point(circle_loc, 1.0, miro.constants.CAM_L )
@@ -431,7 +431,7 @@ class NormalDetector:
 						cv2.putText(outputr, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 3)
 						cv2.putText(outputr, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 			else:
-				print "No balls have been found on the right side."
+				print ("No balls have been found on the right side.")
 				pass
 			# cv2.imshow("outr", outputr)
 			# ball_loc = self.pixel_to_point(circle_loc, 1.0, 1 )	
