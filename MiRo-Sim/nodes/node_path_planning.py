@@ -28,7 +28,7 @@ class PathPlanner:
 		# topic root
 		self.topic_root = name 
 
-		self.cam = miro.utils.camera_model.CameraModel()
+		self.cam = miro.lib.camera_model.CameraModel()
 		# self.pose = np.array([0.0, 0.0, 0.0])
 		#self.cam.set_frame_size(320, 180)
 		# self.detector = Detector(name)
@@ -39,7 +39,7 @@ class PathPlanner:
 		self.data_resolver = DataResolver()
 		self.kinematic_joints = np.array([])
 		#get the loc of sonar on head.
-		self.fovea_HEAD = miro.utils.get("LOC_SONAR_FOVEA_HEAD")
+		self.fovea_HEAD = miro.lib.get("LOC_SONAR_FOVEA_HEAD")
 		# self.fovea_i_WORLD = self.kc.changeFrameAbs(miro.constants.LINK_HEAD, miro.constants.LINK_WORLD, self.fovea_HEAD)
 
 		#Configure ROS interface
@@ -161,7 +161,7 @@ class PathPlanner:
 		dtheta = twist.angular.z
 		self.pose[2] += dtheta * T
 		#将坐标进行旋转变换，一段时间之后，有了
-		dxy = miro.utils.kc.kc_rotate(np.array([dr, 0.0, 0.0]), 'z', self.pose[2])
+		dxy = miro.lib.kc.kc_rotate(np.array([dr, 0.0, 0.0]), 'z', self.pose[2])
 		self.pose += [dxy[0], dxy[1], 0.0]
 
 
