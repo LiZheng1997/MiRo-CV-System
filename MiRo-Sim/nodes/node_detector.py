@@ -82,7 +82,7 @@ class NormalDetector:
 		bbox_lst_l = []
 		miros_l = []
 		bbox = () #bounding box is a tuple format
-		miroCascade = cv2.CascadeClassifier('../lib/MiRo_cascades/cascade_miro04.xml')
+		miroCascade = cv2.CascadeClassifier('../models/miro_cascades/cascade_miro04.xml')
 		while True:
 			time.sleep(0.1)
 			outputl = self.cam_left_image.copy()
