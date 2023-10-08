@@ -506,7 +506,7 @@ class CorePars (object):
 
 		# report
 		flags = self.demo_flags
-		print "demo_flags: \"" + flags + "\""
+		print ("demo_flags: \"" + flags + "\"")
 
 		# handle flags
 		# DOCLINK demo_flags

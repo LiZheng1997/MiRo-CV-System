@@ -1,16 +1,37 @@
 # -*- coding: utf-8 -*-
-#This version is MiRo 1.2, and it is designed for off-board deployment or in the simulator.
-#In this system, I used some OpenCV APIs to support several modules. And also applied some 
-#Neural Network models online for pedestrian detection, this will be compared at the accuracy aspect.
+#!/usr/bin/python3
+# 
+#	@section COPYRIGHT
+#	Copyright (C) 2023 Neurons Vision Ltd
+#
+#	@section AUTHOR
+#	Neuros Vision https://www.neuronsvision.com
+#
+#	@section LICENSE
+#	
+#	
+#	
+#	#############################################################################
+#	# This is the core version of my previous dissertation project.	 			#
+# 	# This project is designed for off-board deployment or the simulator.	 	#
+#	# If you want to reproduce my project result, you can clone this 			#
+# 	# core branch, this can be easier and faster for you to implement.          #
+#	# All codes are deployed off-board rather than on-board, which means all    #
+#	# codes will be deployed on a local computer rather than on a miro robot.   #
+#	# Functionalities include object detection and object tracking, then to     #
+#	# the control module for following a target and also intercepting a target  #
+#	# can be implemented.														#
+# 	# Some codes are inspired from source codes in the MiRo project. You can    #
+#   # you refer to Consequential Robotics http://consequentialrobotics.com		#
+#	#############################################################################
 
-
-#Here is the main control module for this system. 
-#All commands will be processed in this node, we have
-# several nodes in this system, such as tracker node,
-# detector node, neural network node and safety control node.
-#Navigation node can be considered at the end. 
-
-
+'''
+	Here is the main control module for this system. 
+	All commands will be processed in this node, we have
+	several nodes in this system, such as tracker node,
+	detector node, neural network node and safety control node.
+	Navigation node can be considered at the end. 
+'''
 
 import os
 import sys
@@ -18,18 +39,15 @@ import rospy
 import sensor_msgs
 import std_msgs
 import geometry_msgs
-import pars 
+# import pars #注意这个pars的包内包含的所有的机器人的传感器相关的参数。
 import multiprocessing as mp
 import time
 
-#这里导入的包，是这个client的所有必要的参数和功能包。
-#Here I import all basic nodes and their necessary functions to
+# 这里导入的包，是这个client的所有必要的参数和功能包。
+# Here I import all basic nodes and their necessary functions to
 # support the control module.
-
-#import pars #注意这个pars的包内包含的所有的机器人的传感器相关的参数。
-# from node_image_processing import * Delete this node, ignore this node.
 import miro2 as miro
-from cv_bridge import CvBridge #使用CvBridge进行opencv和ros的图像信息进行转换。
+from cv_bridge import CvBridge # 使用CvBridge进行opencv和ros的图像信息进行转换。
 from node_detector import *
 from kc_initiate import *
 from node_path_planning import *
@@ -39,7 +57,7 @@ from node_tracker import *
 from node_CNN_detector import *
 from node_multitracker import *
 from safety_control import * 
-import matplotlib.pyplot as plt # This is a useful package for later painting the diagram. 
+import matplotlib.pyplot as plt
 
 class ControlNode:
 
@@ -219,7 +237,7 @@ class ControlNode:
 if __name__ == "__main__":
 	# init ROS
 	rospy.init_node(os.getenv("MIRO_ROBOT_NAME") + "_client_demo") #, log_level=self.pars.ros.log_level
-	print os.getenv("MIRO_ROBOT_NAME") + "_client_demo"
+	print (os.getenv("MIRO_ROBOT_NAME") + "_client_demo")
 	#self.topic_base_name = "/" + self.pars.ros.robot_name + "/
 	main = ControlNode("miro")
 
@@ -310,7 +328,7 @@ if __name__ == "__main__":
 		# print "angular_vel", angular_vel
 
 		if main.is_activated != True:
-			print "Too close!!!"
+			print ("Too close!!!")
 			break
 
 	# Painting the diagram for viewing the process of angle and angular vel
@@ -318,160 +336,6 @@ if __name__ == "__main__":
 	ax1 = fig.add_subplot(1,2,1)
 	ax1.plot(angle_lst,angular_vel,':')
 	plt.show()
-	
-
-	#Pedestrian detection module using different Neural Network models 
-	#This code part is aimed at using Neural Network for pedestrian detection.
-	# for i in range(100):
-	# while True:
-		# l_bbox, l_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet_l()
-		# r_bbox, r_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet_r()
-		# l_bbox, l_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet50_l()
-		# r_bbox, r_output = main.init_NN_detection_tensorflow_faster_rcnn_resnet50_r()
-		# l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_l_s()
-		# r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_r_s()
-		# l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_l()
-		# r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_r()
-		# l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_l()
-		# r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v1_r()
-		# l_bbox, l_output = main.init_NN_detection_tensorflow_mask_rcnn_l()
-		# r_bbox, r_output = main.init_NN_detection_tensorflow_mask_rcnn_r()
-		# r_bbox, r_output = main.init_NN_detection_caffe_r()
-		# l_bbox, l_output = main.init_NN_detection_caffe_l()
-		# r_bbox, r_output = main.init_NN_detection_squeeze_l()
-		# l_bbox, l_output = main.init_NN_detection_squeeze_r()
-		# r_bbox, r_output = main.init_NN_detection_YOLO_l()
-		# l_bbox, l_output = main.init_NN_detection_YOLO_r()
-
-		# if l_bbox or r_bbox is not None:
-		# 	if len(r_bbox) != 0 and len(l_bbox) != 0:
-		# 		main.init_tracker(l_bbox, r_bbox,l_output, r_output)
-
-		# 	elif len(r_bbox) == 0 and len(l_bbox) != 0:
-		# 		print("No targets at the right side, activate tracking left side.")
-		# 		main.init_tracker_s(l_bbox, l_output, 0)
-
-		# 	elif len(r_bbox) !=0 and len(l_bbox) == 0:
-		# 		print("No targets at the left side, activate tracking right side.")	
-		# 		main.init_tracker_s(r_bbox, r_output, 1)
-
-		# 	elif len(r_bbox) == 0 and len(l_bbox) == 0: 
-		# 		print("No targets at two sides.")
-		# elif l_bbox and r_bbox is None:
-		# 	print "No data from the detection module."
-	###########################################################################
-	###########################################################################
-
-
-
-
-	# MultiTracking module, this code part integrate all modules above to implement 
-	# the whole autonomous system
-	# This is the code part of detecting and tracking, I set a limited loop here 
-	# the loop can be killed by esc key
-	# l_bbox = ()
-	# r_bbox = ()
-	# l_bbox_lst = []
-	# r_bbox_lst = []
-
-	# for i in range(100):
-	# 	data_resolver =DataResolver()
-	# 	#All results from the Ball detection module
-	# 	ball_l_bbox_lst, l_output = main.init_ball_detection_l()
-	# 	ball_r_bbox_lst, r_output= main.init_ball_detection_r()
-	# 	#All results from the MiRo detection module
-	# 	miro_l_bbox_lst, l_output = main.init_miro_detection_l()
-	# 	miro_r_bbox_lst, r_output = main.init_miro_detection_r()
-	# 	#All results from the Pedestrian detection module
-	# 	pedestrian_l_bbox, l_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_l()
-	# 	pedestrian_r_bbox, r_output = main.init_NN_detection_tensorflow_mobile_ssd_v2_r()
-
-	# 	#As I collect two results of the ball bounding box, here might be some None value when
-	# 	# there are no balls be detected, cleaning out some null value if there are.
-	# 	ball_l_bbox_lst = [x for x in ball_l_bbox_lst if x]
-	# 	ball_r_bbox_lst = [x for x in ball_r_bbox_lst if x]
-
-	# 	miro_l_bbox_lst = [x for x in miro_l_bbox_lst if x]
-	# 	miro_r_bbox_lst = [x for x in miro_r_bbox_lst if x]
-
-	# 	if ball_r_bbox_lst or ball_l_bbox_lst is not None:
-	# 		if len(ball_r_bbox_lst) != 0 and len(ball_l_bbox_lst) != 0:
-	# 			r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
-	# 			l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
-
-	# 			l_bbox_lst.append(l_bbox)
-	# 			r_bbox_lst.append(r_bbox)
-
-	# 		elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) != 0:
-	# 			print("No  balls at the right side, activate tracking left side.")
-	# 			l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
-	# 			l_bbox_lst.append(l_bbox)
-				
-	# 		elif len(ball_r_bbox_lst) !=0 and len(ball_l_bbox_lst) == 0:
-	# 			print("No  balls at the left side, activate tracking right side.")	
-	# 			r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
-	# 			r_bbox_lst.append(r_bbox)
-
-	# 		elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) == 0: 
-	# 			print("No  balls at two sides.")
-	# 	elif ball_r_bbox_lst and ball_l_bbox_lst is None:
-	# 		print "No data from the ball detection module."
-	# 	print "l_bbox.",l_bbox_lst
-	# 	print "r_bbox.",r_bbox_lst
-
-
-	# 	if miro_r_bbox_lst or miro_l_bbox_lst is not None:
-	# 		if len(miro_r_bbox_lst) != 0 and len(miro_l_bbox_lst) != 0:
-	# 			r_bbox = data_resolver.box_resolver(miro_r_bbox_lst)
-	# 			l_bbox = data_resolver.box_resolver(miro_l_bbox_lst)
-	# 			l_bbox_lst.append(l_bbox)
-	# 			r_bbox_lst.append(r_bbox)
-				
-	# 		elif len(miro_r_bbox_lst) == 0 and len(miro_l_bbox_lst) != 0:
-	# 			print("No miro robots at the right side, activate tracking left side.")
-	# 			l_bbox = data_resolver.box_resolver(miro_l_bbox_lst)
-	# 			l_bbox_lst.append(l_bbox)
-
-	# 		elif len(miro_r_bbox_lst) !=0 and len(miro_l_bbox_lst) == 0:
-	# 			print("No  miro robots at the left side, activate tracking right side.")	
-	# 			r_bbox = data_resolver.box_resolver(miro_r_bbox_lst)
-	# 			r_bbox_lst.append(r_bbox)
-
-	# 		elif len(miro_r_bbox_lst) == 0 and len(miro_l_bbox_lst) == 0: 
-	# 			print("No  miro robots at two sides.")
-	# 	elif miro_r_bbox_lst and miro_l_bbox_lst is None:
-	# 		print "No data from the miro detection module."
-	# 	print "l_bbox..",l_bbox_lst
-	# 	print "r_bbox..",r_bbox_lst
-
-
-	# 	if pedestrian_l_bbox or pedestrian_r_bbox is not None:
-	# 		if len(pedestrian_r_bbox) != 0 and len(pedestrian_l_bbox) != 0:
-	# 			l_bbox_lst.append(pedestrian_l_bbox)
-	# 			r_bbox_lst.append(pedestrian_r_bbox)
-
-	# 		elif len(pedestrian_r_bbox) == 0 and len(pedestrian_l_bbox) != 0:
-	# 			print("No targets at the right side, activate tracking left side.")
-	# 			l_bbox_lst.append(pedestrian_l_bbox)
-
-	# 		elif len(pedestrian_r_bbox) !=0 and len(pedestrian_l_bbox) == 0:
-	# 			print("No targets at the left side, activate tracking right side.")	
-	# 			r_bbox_lst.append(pedestrian_r_bbox)
-
-	# 		elif len(pedestrian_r_bbox) == 0 and len(pedestrian_l_bbox) == 0: 
-	# 			print("No targets at two sides.")
-				
-	# 	elif pedestrian_l_bbox and pedestrian_r_bbox is None:
-	# 		print "No data from the detection module."
-	# 	print "l_bbox...",l_bbox_lst
-	# 	print "r_bbox...",r_bbox_lst
-
-
-
-	# 	main.init_multi_tracker(l_bbox_lst,1)
-	# 	main.init_multi_tracker(r_bbox_lst,0)
-	# main.init_multi_tracker_s(1)
-	# main.init_multi_tracker_s(0)
 
 
 
