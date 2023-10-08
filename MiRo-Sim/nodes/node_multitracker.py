@@ -129,7 +129,7 @@ class MultiTracker:
 				time.sleep(0.1)
 				frame = self.cam_right_image.copy()
 			if frame is None:
-				print "no image is readed"
+				print("no image is readed")
 				break
 			# Start now, calculate the time.
 			now = cv.getTickCount()
@@ -226,7 +226,7 @@ class MultiTracker:
 				time.sleep(0.1)
 				frame = self.cam_right_image.copy()
 			if frame is None:
-				print "no image is readed"
+				print("no image is readed") 
 				break
 
 			# Start now, calculate the time.
