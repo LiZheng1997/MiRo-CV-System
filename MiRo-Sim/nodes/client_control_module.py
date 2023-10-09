@@ -13,16 +13,16 @@
 #	
 #	#############################################################################
 #	# This is the core version of my previous dissertation project.	 			#
-# 	# This project is designed for off-board deployment or the simulator.	 	#
+# 	# This project is designed for off-board deployment or the simulator.		#
 #	# If you want to reproduce my project result, you can clone this 			#
-# 	# core branch, this can be easier and faster for you to implement.          #
-#	# All codes are deployed off-board rather than on-board, which means all    #
-#	# codes will be deployed on a local computer rather than on a miro robot.   #
-#	# Functionalities include object detection and object tracking, then to     #
-#	# the control module for following a target and also intercepting a target  #
+# 	# core branch, this can be easier and faster for you to implement.			#
+#	# All codes are deployed off-board rather than on-board, which means all	#
+#	# codes will be deployed on a local computer rather than on a miro robot.	#
+#	# Functionalities include object detection and object tracking, then to		#
+#	# the control module for following a target and also intercepting a target	#
 #	# can be implemented.														#
-# 	# Some codes are inspired from source codes in the MiRo project. You can    #
-#   # you refer to Consequential Robotics http://consequentialrobotics.com		#
+#	# Some codes are inspired from source codes in the MiRo project. You can	#
+#	# you refer to Consequential Robotics http://consequentialrobotics.com		#
 #	#############################################################################
 
 
