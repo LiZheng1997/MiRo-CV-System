@@ -40,7 +40,7 @@ import rospy
 import sensor_msgs
 import std_msgs
 import geometry_msgs
-# import pars #注意这个pars的包内包含的所有的机器人的传感器相关的参数。
+import pars #注意这个pars的包内包含的所有的机器人的传感器相关的参数。
 import multiprocessing as mp
 import time
 
@@ -221,7 +221,8 @@ if __name__ == "__main__":
     # init ROS
     rospy.init_node(os.getenv("MIRO_ROBOT_NAME") + "_client_demo") # log_level=self.pars.ros.log_level
     print (os.getenv("MIRO_ROBOT_NAME") + "_client_demo")
-    self.topic_base_name = self.pars.ros.robot_name
+    pars = pars.CorePars()
+    topic_base_name = pars.ros.robot_name
     main = ControlNode("miro")
     main.init_kinematic()# Initiate the kinematic status of MiRo
 
@@ -258,7 +259,7 @@ if __name__ == "__main__":
     # ball_r_bbox_lst= []
     # angular_vel = []
     # angle_lst = []
-    data_resolver = utils.DataResolver()
+    data_resolver = utils.data_resolver.DataResolver()
 
     # Set a loop for the system for testing, may use # while main.is_activated ==True:
     for i in range(10):
