@@ -82,7 +82,7 @@ class NormalDetector:
 		bbox_lst_l = []
 		miros_l = []
 		bbox = () #bounding box is a tuple format
-		miroCascade = cv2.CascadeClassifier('/home/lz/Documents/Program-Released-Codes/MiRo-CV-System/MiRo-Sim/models/miro_cascades/cascade_miro03.xml')# 这里用绝对路径
+		miroCascade = cv2.CascadeClassifier('/home/lz/Documents/Program-Released-Codes/MiRo-CV-System/MiRo-Sim/models/miro_cascades/cascade_miro01.xml')# 这里用绝对路径
 		while True:
 			time.sleep(0.1)
 			outputl = self.cam_left_image.copy()
@@ -125,7 +125,7 @@ class NormalDetector:
 		bbox_lst_r = []
 		miros_r = []
 		bbox = () #bounding box is a tuple format
-		miroCascade = cv2.CascadeClassifier('/home/lz/Documents/Program-Released-Codes/MiRo-CV-System/MiRo-Sim/models/miro_cascades/cascade_miro03.xml')
+		miroCascade = cv2.CascadeClassifier('/home/lz/Documents/Program-Released-Codes/MiRo-CV-System/MiRo-Sim/models/miro_cascades/cascade_miro01.xml')
 		# cv2.namedWindow("detect_miros_right")
 		while True:
 			time.sleep(0.1)
