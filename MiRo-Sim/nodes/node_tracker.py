@@ -409,7 +409,7 @@ class Tracker:
                 # cv.line(l_frame,(l_object_x,180),(320,180),(0,0,255),2)
                 print("left_actual angle---------->:", l_angle)
                 if l_angle != 0:
-                    self.velocity = self.direction_keeper.reguralize_angle(l_angle, direction, True)
+                    self.velocity = self.direction_keeper.reguralize_angle(l_angle, direction, False)
                     l_angular_vel.append(self.velocity.twist.angular.z)
                 # The final status is the robot's velocity lies on the sight line between the 
                 #robot and the target. I set a small value for the accepted error range of degrees
