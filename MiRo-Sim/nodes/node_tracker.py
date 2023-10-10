@@ -94,7 +94,7 @@ class Tracker:
     def callback_sensors(self,msg):
         self.sensors_pack = msg
 
-    #monocular way for tracking
+    # monocular way for tracking, only use one camera to track the target.
     def tracking_motion_s(self,bbox,image,cam_index):
         #check the opencv version
         (major_ver, minor_ver, subminor_ver) = (cv.__version__).split('.')
