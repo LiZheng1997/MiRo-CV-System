@@ -321,7 +321,7 @@ while True:
         print("Completing Action 9")
         velocity.twist.linear.x = 0.4
         t_now = 0.0
-        while t_now < 20:
+        while t_now < 40:
             velocity_pub.publish(velocity)
             time.sleep(0.01)
             t_now+=0.01
