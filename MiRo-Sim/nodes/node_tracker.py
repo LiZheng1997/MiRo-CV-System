@@ -398,13 +398,13 @@ class Tracker:
             r_center_pos = [r_box[0]+r_box[2]/2, r_box[1]+r_box[3]/2]
             r_object_x = int(r_center_pos[0])
             
-            if l_ok and r_ok is False:
+            if l_ok and r_ok is True:
                 p1 = (int(l_newbox[0]), int(l_newbox[1]))  # bbox左上角的点
                 p2 = (int(l_newbox[0] + l_newbox[2]), int(l_newbox[1] + l_newbox[3]))  # bbox右下角的点
                 # cv.rectangle(frame, p1, p2, (200,0,0))
                 cv.rectangle(l_frame, p1, p2, (255,0,0), 2, 1)
                 l_angle, l_beta, l_t_pos, direction ,l_center_line= self.direction_keeper.diret_keeper(l_center_pos,r_center_pos,pose)
-                cv.line(l_frame,(l_object_x,180),(l_object_x,360),(255,0,0),1)
+                l_frame = cv.line(l_frame,(l_object_x,180),(l_object_x,360),(255,0,0),1)
                 l_frame = cv.line(l_frame,(l_object_x,180),(int(l_center_line[0]),180),(0,0,255),2)
                 # cv.line(l_frame,(l_object_x,180),(320,180),(0,0,255),2)
                 print("left_actual angle---------->:", l_angle)
@@ -426,10 +426,16 @@ class Tracker:
             elif l_ok != True :
                 # Tracking failure
                 cv.putText(l_frame, "Tracking failure detected", (100,80), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-                pass
+                cv2.destroyAllWindows()
+                break
+            elif r_ok != True :
+                # Tracking failure
+                cv.putText(r_frame, "Tracking failure detected", (100,80), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
+                # cv2.destroyAllWindows()
+                break
+            
             # Display tracker type on l_frame
             cv.putText(l_frame, l_tracker_type + " Tracker", (100,20), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
-        
             # Display FPS on l_frame
             cv.putText(l_frame, "FPS : " + str(int(l_fps)), (100,50), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50), 2)
 
@@ -440,48 +446,8 @@ class Tracker:
             #draw the calibration lines at x and y axis in the middle of the image.
             cv.line(l_frame, (0, int(round(im_centre_h))), (im_w, int(round(im_centre_h))), (100, 100, 100), 1)
             cv.line(l_frame, (int(round(im_centre_w)), 0), (int(round(im_centre_w)), im_h), (100, 100, 100), 1)
-            # and l_ok == False
-            if r_ok and l_ok == False:
-                p1 = (int(r_newbox[0]), int(r_newbox[1]))
-                p2 = (int(r_newbox[0] + r_newbox[2]), int(r_newbox[1] + r_newbox[3]))
-                # cv.rectangle(frame, p1, p2, (200,0,0))
-                cv.rectangle(r_frame, p1, p2, (255,0,0), 2, 1)
-                r_angle, r_beta, r_t_pos,direction,r_center_line = self.direction_keeper.diret_keeper(l_center_pos,r_center_pos,pose)
-                cv.line(r_frame,(r_object_x,180),(r_object_x,360),(255,0,0),1)
-                cv.line(r_frame,(r_object_x,180),(int(r_center_line[0]),180),(0,0,255),2)
-                print("left_actual angle---------->:", r_angle)
-                if r_angle !=0:
-                    self.velocity = self.direction_keeper.reguralize_angle(r_angle,direction, True)
-                    r_angular_vel.append(self.velocity.twist.angular.z)
-                # The final status is the robot's velocity lies on the sight line between the 
-                #robot and the target. I set a small value for the accepted error range of degrees
-                # at 1 degree, in this case, the direction of the robot is almost directed forward 
-                # to the target. Also, if the old target position is None, it means there is no postion
-                # info at the initiate stage, so we need to skip this result.
-                #considering the time limitation, we cannot allow the robot to regularize
-                # the angle at a extremelly accurate stage,so here i just give him a large
-                #angle to push the velocity.  
-                if r_old_t_pos is not None:
-                # 	#update the pose from the subscriber
-                    # pose = np.array([self.pose.x,self.pose.y,self.pose.theta])
-                    self.global_planner.path_planning(1,r_center_pos,r_old_t_pos,r_beta,pose,r_now,r_old_time,self.velocity.twist.angular.z)
-            elif r_ok != True :
-                # Tracking failure
-                cv.putText(r_frame, "Tracking failure detected", (100,80), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-                cv2.destroyAllWindows()
-                break
-            # Display tracker type on r_frame
-            cv.putText(r_frame, r_tracker_type + " Tracker", (100,20), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50),2)
-        
-            # Display FPS on r_frame
-            cv.putText(r_frame, "FPS : " + str(int(r_fps)), (100,50), cv.FONT_HERSHEY_SIMPLEX, 0.75, (50,170,50), 2)
-            im_h = np.size(r_frame, 0)
-            im_w = np.size(r_frame, 1)
-            im_centre_h = im_h / 2.0
-            im_centre_w = im_w / 2.0
-            #draw the calibration lines at x and y axis in the middle of the image.
-            cv.line(r_frame, (0, int(round(im_centre_h))), (im_w, int(round(im_centre_h))), (100, 100, 100), 1)
-            cv.line(r_frame, (int(round(im_centre_w)), 0), (int(round(im_centre_w)), im_h), (100, 100, 100), 1)
+
+
 
             #set the frames number for this tracking module to update, it means a epoch is 50 frames
             frame_count += 1
