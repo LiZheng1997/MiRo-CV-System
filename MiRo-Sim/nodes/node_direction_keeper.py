@@ -153,7 +153,7 @@ class DirectionKeeper:
         #机器人修正角度为theta， target和robot之间的lambda为 beta这里
         # ，alpha为机器人的中心旋转角。用beta - alpha的原因和驱动轮子的速度
         #是正是负，左转还是右转有关。
-        return theta ,beta, t_pos
+        return theta, beta, t_pos
 
     def reguralize_angle(self, angle, direction, slow):
         '''reguralize the robot's augular velocity refer to angle values.
@@ -163,12 +163,12 @@ class DirectionKeeper:
                 slow: the slow mode to choose or not, True is slow mode.
         '''
         if slow:
-            spin = 6.2832 * 0.1  # 6.2832 is two pi(3.141592), 0.1 is the speed gain.
+            spin = 6.2832 * 0.5  # 6.2832 is two pi(3.141592), 0.1 is the speed gain.
             # spin = math.radians(angle) *4
             v = angle/90 #using the
 
         else:
-            spin = 6.2832 * 0.7  # 6.2832 is two pi(3.141592), 0.7 is the speed gain.
+            spin = 6.2832 * 1.2  # 6.2832 is two pi(3.141592), 0.7 is the speed gain.
             # spin = math.radians(angle) * 8
             v = angle/90
 
