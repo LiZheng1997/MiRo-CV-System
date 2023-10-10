@@ -28,7 +28,7 @@ class NormalDetector:
 	def __init__ (self,name):
 		self.topic_root =  name 
 		#set the default size of the camera
-		self.cam_model = miro.utils.CameraModel()
+		self.cam_model = miro.lib.CameraModel()
 		self.frame_w = 0
 		self.frame_h = 0
 		# self.cam_model.set_frame_size(640, 320)
@@ -82,7 +82,7 @@ class NormalDetector:
 		bbox_lst_l = []
 		miros_l = []
 		bbox = () #bounding box is a tuple format
-		miroCascade = cv2.CascadeClassifier('../lib/MiRo_cascades/cascade_miro04.xml')
+		miroCascade = cv2.CascadeClassifier('/home/lz/Documents/Program-Released-Codes/MiRo-CV-System/MiRo-Sim/models/miro_cascades/cascade_miro01.xml')# 这里用绝对路径
 		while True:
 			time.sleep(0.1)
 			outputl = self.cam_left_image.copy()
@@ -125,7 +125,7 @@ class NormalDetector:
 		bbox_lst_r = []
 		miros_r = []
 		bbox = () #bounding box is a tuple format
-		miroCascade = cv2.CascadeClassifier('../lib/MiRo_cascades/cascade_miro04.xml')
+		miroCascade = cv2.CascadeClassifier('/home/lz/Documents/Program-Released-Codes/MiRo-CV-System/MiRo-Sim/models/miro_cascades/cascade_miro01.xml')
 		# cv2.namedWindow("detect_miros_right")
 		while True:
 			time.sleep(0.1)
@@ -326,7 +326,7 @@ class NormalDetector:
 						cv2.putText(outputl, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 3)
 						cv2.putText(outputl, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 			else:
-				print "No balls have been found on the left side."
+				print ("No balls have been found on the left side.")
 				pass
 			# cv2.imshow("outl", outputl)
 			# circle_point = self.pixel_to_point(circle_loc, 1.0, miro.constants.CAM_L )
@@ -431,7 +431,7 @@ class NormalDetector:
 						cv2.putText(outputr, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 3)
 						cv2.putText(outputr, line, (max_circle[0]+5, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 			else:
-				print "No balls have been found on the right side."
+				print ("No balls have been found on the right side.")
 				pass
 			# cv2.imshow("outr", outputr)
 			# ball_loc = self.pixel_to_point(circle_loc, 1.0, 1 )	

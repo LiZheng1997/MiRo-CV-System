@@ -76,7 +76,7 @@ class ChangeKc:
 
 	def change_kc(self,kinematic_joints):
 
-		kc = miro.utils.kc_interf.kc_miro()
+		kc = miro.lib.kc_interf.kc_miro()
 		# kinematic_joints = np.array([miro.constants.TILT_RAD_CALIB, np.radians(30.0), np.radians(15.0), np.radians(0.0)])
 		kc.setConfig(kinematic_joints)
 		# point = kc.changeFrameAbs(miro.constants.LINK_HEAD, miro.constants.LINK_WORLD, point)

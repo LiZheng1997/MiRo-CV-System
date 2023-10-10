@@ -1,6 +1,8 @@
 # python
 # -*- coding: utf-8 -*-
 import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import math
 import numpy as np
 import time
@@ -18,7 +20,7 @@ import cv2
 from cv_bridge import CvBridge, CvBridgeError
 from node_detector import *
 from transform import *
-from data_resolver import *
+from utils import data_resolver
 
 import node_change_kc
 
@@ -28,7 +30,7 @@ class PathPlanner:
 		# topic root
 		self.topic_root = name 
 
-		self.cam = miro.utils.camera_model.CameraModel()
+		self.cam = miro.lib.camera_model.CameraModel()
 		# self.pose = np.array([0.0, 0.0, 0.0])
 		#self.cam.set_frame_size(320, 180)
 		# self.detector = Detector(name)
@@ -36,10 +38,10 @@ class PathPlanner:
 		self.dfovea_WORLD = []
 		self.kc_updater = node_change_kc.ChangeKc(name)
 		self.transformer = Transformer(name)
-		self.data_resolver = DataResolver()
+		self.data_resolver = data_resolver.DataResolver()
 		self.kinematic_joints = np.array([])
 		#get the loc of sonar on head.
-		self.fovea_HEAD = miro.utils.get("LOC_SONAR_FOVEA_HEAD")
+		self.fovea_HEAD = miro.lib.get("LOC_SONAR_FOVEA_HEAD")
 		# self.fovea_i_WORLD = self.kc.changeFrameAbs(miro.constants.LINK_HEAD, miro.constants.LINK_WORLD, self.fovea_HEAD)
 
 		#Configure ROS interface
@@ -92,7 +94,7 @@ class PathPlanner:
 
 		vel_t = t_move_distance / (now-old_time)
 		if vel_t > 0.4:
-			print "The target's speed is larger than the max speed of robot! "
+			print ("The target's speed is larger than the max speed of robot! ")
 		else:
 			vel_r = 0.4 #m/s
 		print("vel_t:---------------------------------------->",vel_t)
@@ -161,7 +163,7 @@ class PathPlanner:
 		dtheta = twist.angular.z
 		self.pose[2] += dtheta * T
 		#将坐标进行旋转变换，一段时间之后，有了
-		dxy = miro.utils.kc.kc_rotate(np.array([dr, 0.0, 0.0]), 'z', self.pose[2])
+		dxy = miro.lib.kc.kc_rotate(np.array([dr, 0.0, 0.0]), 'z', self.pose[2])
 		self.pose += [dxy[0], dxy[1], 0.0]
 
 

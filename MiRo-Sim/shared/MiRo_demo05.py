@@ -32,8 +32,8 @@ class Controller():
 		self.image_converter = CvBridge()
 
 		# Create resource for controlling body_node
-		self.pars = miro.utils.PlatformPars()
-		self.cam_model = miro.utils.CameraModel()
+		self.pars = miro.lib.PlatformPars()
+		self.cam_model = miro.lib.CameraModel()
 		self.frame_w = 0
 		self.frame_h = 0
 

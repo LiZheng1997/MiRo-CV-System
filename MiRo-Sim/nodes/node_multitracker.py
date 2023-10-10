@@ -19,7 +19,7 @@ class MultiTracker:
 
 	def __init__(self,name):
 		self.topic_root =  name
-		self.cam_model = miro.utils.CameraModel()
+		self.cam_model = miro.lib.CameraModel()
 		#Using the default size of camera
 		self.frame_w = 0
 		self.frame_h = 0
@@ -95,7 +95,7 @@ class MultiTracker:
 			time.sleep(0.1)
 			frame = self.cam_right_image.copy()
 		if frame is None:
-			print "no image is readed"
+			print("no image is readed")
 			pass
 		#store three bounding boxes seperately, named pedestrian, miro and ball
 		# only ball bounding box has to be checked for the range of the bounding
@@ -129,7 +129,7 @@ class MultiTracker:
 				time.sleep(0.1)
 				frame = self.cam_right_image.copy()
 			if frame is None:
-				print "no image is readed"
+				print("no image is readed")
 				break
 			# Start now, calculate the time.
 			now = cv.getTickCount()
@@ -226,7 +226,7 @@ class MultiTracker:
 				time.sleep(0.1)
 				frame = self.cam_right_image.copy()
 			if frame is None:
-				print "no image is readed"
+				print("no image is readed") 
 				break
 
 			# Start now, calculate the time.

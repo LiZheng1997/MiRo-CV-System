@@ -19,8 +19,8 @@ class Camera:
 		self.image_converter = CvBridge()
 
 		# Create resource for controlling body_node
-		#self.pars = miro.utils.PlatformPars()
-		self.cam_model = miro.utils.CameraModel()
+		#self.pars = miro.lib.PlatformPars()
+		self.cam_model = miro.lib.CameraModel()
 		
 		#Using the default size of camera
 		self.frame_w = 640

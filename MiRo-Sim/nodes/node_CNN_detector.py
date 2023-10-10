@@ -22,7 +22,7 @@ class NN_detector:
 		# global bbox
 		self.topic_root =  name 
 		#set the default size of the camera
-		self.cam_model = miro.utils.CameraModel()
+		self.cam_model = miro.lib.CameraModel()
 		#Using the default size of camera
 		self.frame_w = 0
 		self.frame_h = 0

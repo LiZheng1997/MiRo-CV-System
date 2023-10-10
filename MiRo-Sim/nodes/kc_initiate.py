@@ -26,7 +26,7 @@ class Kc_init:
 		# state
 		# create kc object with default (calibration) configuration
 		# of joints (and zeroed pose of FOOT in WORLD)
-		self.kc = miro.utils.kc_interf.kc_miro()
+		self.kc = miro.lib.kc_interf.kc_miro()
 		# self.cam = miro.utils.camera_model.CameraModel()
 		# self.pose = np.array([0.0, 0.0, 0.0])
 		self.kin_joints = JointState()
