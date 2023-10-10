@@ -35,35 +35,35 @@ class DirectionKeeper:
     def diret_keeper(self,avg_l, avg_r,pose):
         '''direction keeping control for robots in both left and right sides.
             params:
-                avg_l: average left angle values
-                avg_r: average right angle values
+                avg_l: average left center pos values
+                avg_r: average right center pos values
                 pose: current robot pose in world coord
         '''
-        reg_range = 0  # use the reg_range to direct the robot to the sight line
+        # reg_range = 0  # use the reg_range to direct the robot to the sight line
         direction = None
         angle = 0
         t_pos = None
         beta = 0
         # set the width to the default value 640 默认的设定是图像的宽是640
         dif_l = 640 - avg_l[0]  # + 50
-        center_pos = [0, avg_l[1]]
+        center_pos = [460, avg_l[1]]  # the center pos x is 460
         if dif_l <= (180 + 2 ) and dif_l >= (180 - 2):
             print("direction is corrected.")
             direction = 0
-            angle, beta, t_pos= self.direct_to_slightLine(center_pos,avg_r,1, pose)
+            angle, beta, t_pos= self.direct_to_sightline(center_pos, avg_r, 1, pose)
         elif dif_l < (180 - 2):
             direction = -1
-            reg_range = int(abs(dif_l - 180) )
-            print("reg_range-------------->",reg_range)
-            center_pos[0] = avg_l[0] - reg_range  #35 50
-            angle,beta,t_pos = self.direct_to_slightLine( center_pos, avg_r, 1, pose)
+            # reg_range = int(abs(dif_l - 180) )
+            # print("reg_range-------------->",reg_range)
+            # center_pos[0] = avg_l[0] - reg_range  #35 50
+            angle, beta, t_pos = self.direct_to_sightline(center_pos, avg_r, 1, pose)
 
         elif dif_l > (180 + 2):
             direction  = 1
-            reg_range = int(abs(dif_l - 180) )
-            print("reg_range-------------->",reg_range)
-            center_pos[0] = avg_l[0] + reg_range
-            angle,beta,t_pos = self.direct_to_slightLine( center_pos, avg_r, 1, pose)
+            # reg_range = int(abs(dif_l - 180) )
+            # print("reg_range-------------->",reg_range)
+            # center_pos[0] = avg_l[0] + reg_range
+            angle, beta, t_pos = self.direct_to_sightline(center_pos, avg_r, 1, pose)
         return angle, beta, t_pos, direction, center_pos
 
 
@@ -104,14 +104,14 @@ class DirectionKeeper:
             center_pos = [180,avg[1]]  # why 180?, because the center_pos X value is not the head center.
         if avg[0] < center_pos[0] - 2:
             direction = 1
-            angle, beta, t_pos= self.direct_to_slightLine(center_pos,avg,cam_index, pose)
+            angle, beta, t_pos= self.direct_to_sightline(center_pos,avg,cam_index, pose)
         elif center_pos[0]- 2 <= avg[0] and  avg[0]  <= center_pos[0]+ 2:
             print("direction is corrected.")
             direction = 0
-            angle, beta, t_pos= self.direct_to_slightLine(center_pos,avg,cam_index, pose)
+            angle, beta, t_pos= self.direct_to_sightline(center_pos,avg,cam_index, pose)
         elif avg[0]> center_pos[0]+ 2:
             direction = -1
-            angle,beta, t_pos = self.direct_to_slightLine(center_pos,avg,cam_index, pose)
+            angle,beta, t_pos = self.direct_to_sightline(center_pos,avg,cam_index, pose)
         return angle, beta, t_pos, direction, center_pos
 
     #时刻注意这里的角度的求解，利用世界坐标的2D平面进行几何关系的计算，所以这里我们的姿态需要不断的
@@ -119,17 +119,14 @@ class DirectionKeeper:
     #距离和旋转的总角度，（x,y, theta)
     # remeber the pose here in the function should be changed during the moving of 
     # the robot, so the pose later will be a parameter in the function.
-    def direct_to_slightLine(self, center_pos, target_pos, cam_index, pose):
+    def direct_to_sightline(self, center_pos, target_pos, cam_index, pose):
         '''This func is the core func to control robots to minize the angle value
         between its head direction and the target direction.
         '''
 
-        #assume that the pose of miro robot is at the original point of 
-        # the world coordination system 
+        # assume that the pose of miro robot is at the original point of
+        # the world coordination system
         robot_pos = np.array([pose[0],pose[1]])
-        # print("pose[0]:",pose[0])
-        # print("pose[1]:",pose[1])
-        # print("robot_pos[0]:",robot_pos[0])
         c_pos = self.transformer.pixel_to_world(cam_index, center_pos,pose )
         t_pos = self.transformer.pixel_to_world(cam_index, target_pos,pose )
 
@@ -180,7 +177,7 @@ class DirectionKeeper:
             self.velocity.twist.angular.z = direction * spin * v
             # self.velocity.twist.angular.z = math.radians(angle)
             self.velocity_pub.publish(self.velocity)
-          
+
         elif direction == -1:
             self.velocity.twist.linear.x = 0.4
             self.velocity.twist.angular.z = direction * spin * v
