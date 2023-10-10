@@ -103,7 +103,7 @@ class DataResolver:
         return box_tuple
 
     def distance_resolver(self,start, end):
-        '''This func is designed for calculating the distance in the world coordination.
+        '''This func is designed for calculating the distance between two points.
         '''
         x_distance = np.square(start[0] - end[0])
         y_distance = np.square(start[1]- end[1])
