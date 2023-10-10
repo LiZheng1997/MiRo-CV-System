@@ -168,7 +168,7 @@ class DirectionKeeper:
             v = angle/90 #using the
 
         else:
-            spin = 6.2832 * 1.0  # 6.2832 is two pi(3.141592), 0.7 is the speed gain.
+            spin = 6.2832 * 0.8  # 6.2832 is two pi(3.141592), 0.7 is the speed gain.
             # spin = math.radians(angle) * 8
             v = angle/90
 
