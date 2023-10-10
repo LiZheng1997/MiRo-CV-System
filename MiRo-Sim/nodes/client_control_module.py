@@ -40,7 +40,7 @@ import rospy
 import sensor_msgs
 import std_msgs
 import geometry_msgs
-import pars #注意这个pars的包内包含的所有的机器人的传感器相关的参数。
+import pars  # 注意这个pars的包内包含的所有的机器人的传感器相关的参数。
 import multiprocessing as mp
 import time
 
@@ -57,7 +57,7 @@ from node_direction_keeper import *
 from node_tracker import *
 from node_CNN_detector import *
 from node_multitracker import *
-from safety_control import * 
+from safety_control import *
 import matplotlib.pyplot as plt
 
 class ControlNode:
@@ -151,10 +151,9 @@ class ControlNode:
 
 
 
-    """The following functions are some neural network models can be used and tested in this system.
-    Some functions are still in the testing stage, I will use a stable model in the following main function later.
-    Every camera will initiate the neural network model once. 
-    """
+    # The following functions are some neural network models can be used and tested in this system.
+    # Some functions are still in the testing stage, I will use a stable model in the following main function later.
+    # Every camera will initiate the neural network model once.
     def init_NN_detection_caffe_l(self):
         bbox, output = self.NN_detector.detect_targets_caffe('../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.prototxt.txt', '../lib/mobilenet_ssd_caffe/MobileNetSSD_deploy.caffemodel',True)
         return bbox, output
@@ -262,12 +261,11 @@ if __name__ == "__main__":
     # angle_lst = []
     data_resolver = utils.data_resolver.DataResolver()
 
-    # Set a loop for the system for testing, may use # while main.is_activated ==True:
+    # Set a loop for the system for testing, may use while main.is_activated ==True:
     for i in range(10):
         # This is the safety controller, every time it will check the sonar sensor to judge if the 
         # the distance between the robot and the target or other objects is less than 0.15,
         main.is_activated = main.init_safety_controller()
-
         # MiRo detection block, ouput the detected bbox and the output image
         miro_l_bbox_lst, l_output = main.init_miro_detection_l()
         miro_r_bbox_lst, r_output = main.init_miro_detection_r()
@@ -281,8 +279,8 @@ if __name__ == "__main__":
         # ball_r_bbox_lst = [x for x in ball_r_bbox_lst if x]
 
         # clean up null tuples in the list 清除空元组在列表中
-        l_bbox_lst = [x for x in miro_l_bbox_lst if x]  # detected bbox on the left camera 
-        r_bbox_lst = [x for x in miro_r_bbox_lst if x]  # detected bbox on the right camera 
+        l_bbox_lst = [x for x in miro_l_bbox_lst if x]  # detected bbox on the left camera
+        r_bbox_lst = [x for x in miro_r_bbox_lst if x]  # detected bbox on the right camera
 
         if len(r_bbox_lst) != 0 and len(l_bbox_lst) != 0:
             r_bbox = data_resolver.box_resolver(r_bbox_lst)
@@ -301,7 +299,6 @@ if __name__ == "__main__":
 
         elif len(r_bbox_lst) == 0 and len(l_bbox_lst) == 0:
             print("No targets at two sides.")
-
 
         if main.is_activated is not True:
             print ("Too close!!!")
