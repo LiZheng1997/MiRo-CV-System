@@ -223,7 +223,8 @@ if __name__ == "__main__":
     print (os.getenv("MIRO_ROBOT_NAME") + "_client_demo")
     pars = pars.CorePars()
     topic_base_name = pars.ros.robot_name
-    main = ControlNode("miro")
+    # main = ControlNode("miro")
+    main = ControlNode(topic_base_name)
     main.init_kinematic()# Initiate the kinematic status of MiRo
 
     # ######################################################################## #
