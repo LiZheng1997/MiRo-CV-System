@@ -295,18 +295,15 @@ if __name__ == "__main__":
             angular_vel , angle_lst = main.init_tracker_s(l_bbox, l_output, 0)
 
         elif len(r_bbox_lst) !=0 and len(l_bbox_lst) == 0:
-            print("No targets at the left side, activate tracking right side.")	
+            print("No targets at the left side, activate tracking right side.")
             r_bbox = data_resolver.box_resolver(r_bbox_lst)
             angular_vel , angle_lst = main.init_tracker_s(r_bbox, r_output, 1)
 
         elif len(r_bbox_lst) == 0 and len(l_bbox_lst) == 0:
             print("No targets at two sides.")
-        
-        #for testing the controlling module.
-        # print "angle_lst" ,angle_lst
-        # print "angular_vel", angular_vel
 
-        if main.is_activated != True:
+
+        if main.is_activated is not True:
             print ("Too close!!!")
             break
 
