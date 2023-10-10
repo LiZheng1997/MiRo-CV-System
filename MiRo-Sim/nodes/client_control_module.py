@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/python3
+# -*- coding:utf-8 -*-
 #
 #   @section COPYRIGHT
 #   Copyright (C) 2023 Neurons Vision Ltd
@@ -52,7 +52,7 @@ from cv_bridge import CvBridge # 使用CvBridge进行opencv和ros的图像信息
 from node_detector import *
 from kc_initiate import *
 from node_path_planning import *
-from data_resolver import *
+import utils
 from node_direction_keeper import *
 from node_tracker import *
 from node_CNN_detector import *
@@ -64,17 +64,11 @@ class ControlNode:
 
     def __init__(self, name):
         # global topic_root
-        #self.pars = pars.CorePars()
+        # self.pars = pars.CorePars()
         # set the robot name
         # topic_root = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
         topic_root = "/" + name + "/"
-        self.is_activated = True #The default safety range control is opened, so the default value is True.
-
-        #create the standard camera model
-        #self.cam = miro.utils.camera_model.CameraModel()
-        # this needs to be set based on the actual frame size, which
-        # can be obtained from the camera frame topic. Here, we just
-        # assume the default frame size is in use. The default size is (640,360)
+        self.is_activated = True # The default safety range control is opened, so the default value is True.
 
         #Initinalize some essential instances.
         self.kc = Kc_init(topic_root)
@@ -101,7 +95,7 @@ class ControlNode:
         bbox, output = self.detector.detect_balls_r("#0000FF")
         return bbox, output
 
-    #Pick a color you want to detect, sometimes exterior light source will affect the detection
+    # Pick a color you want to detect, sometimes exterior light source will affect the detection
     def init_ball_detection_l(self):#0000FF #DE3163 #DC143C #E32636 #FF4D00 
         bbox, output = self.detector.detect_ball_l("#0000FF")
         return bbox, output
@@ -220,18 +214,6 @@ class ControlNode:
     def test(self):
         self.path.init_pos()
 
-    # try to use multiprocess to make the code more efficient, multi process or thread can be
-    # a way to improve the efficiency. For testers, just ignore these parts
-    # def multiprocess_ball(self):
-    # 	pool = mp.Pool(processes=3)
-    # 	# l_ball = pool.apply_async(self.init_ball_detection_l)
-    # 	# r_ball = pool.apply_async(self.init_ball_detection_r )
-    # 	l_c_pixel = pool.map(self.init_ball_detection_l,range(10))
-    # 	# r_c_pixel, r_ball = pool.map(self.init_ball_detection_r,range(1))
-    # 	# l_ball = l_ball.get()
-    # 	# r_ball = r_ball.get()
-    # 	return l_c_pixel
-
 
 
 # The main function of this control system
@@ -239,7 +221,7 @@ if __name__ == "__main__":
     # init ROS
     rospy.init_node(os.getenv("MIRO_ROBOT_NAME") + "_client_demo") # log_level=self.pars.ros.log_level
     print (os.getenv("MIRO_ROBOT_NAME") + "_client_demo")
-    self.topic_base_name = "/" + self.pars.ros.robot_name + "/
+    self.topic_base_name = self.pars.ros.robot_name
     main = ControlNode("miro")
     main.init_kinematic()# Initiate the kinematic status of MiRo
 
@@ -276,49 +258,46 @@ if __name__ == "__main__":
     # ball_r_bbox_lst= []
     # angular_vel = []
     # angle_lst = []
-    data_resolver = DataResolver()
+    data_resolver = utils.DataResolver()
 
-    # Set a loop for the system for testing
+    # Set a loop for the system for testing, may use # while main.is_activated ==True:
     for i in range(10):
-
-        # while main.is_activated ==True:
-        #This is the safety controller, every time it will check the sonar sensor to judge if the 
-        #the distance between the robot and the target or other objects is less than 0.15,
+        # This is the safety controller, every time it will check the sonar sensor to judge if the 
+        # the distance between the robot and the target or other objects is less than 0.15,
         main.is_activated = main.init_safety_controller()
 
-        #MiRo detection
+        # MiRo detection block, ouput the detected bbox and the output image
         miro_l_bbox_lst, l_output = main.init_miro_detection_l()
         miro_r_bbox_lst, r_output = main.init_miro_detection_r()
 
-        #Ball detection
+        # Ball detection block
         # ball_l_bbox_lst, l_output = main.init_ball_detection_l()
         # ball_r_bbox_lst, r_output= main.init_ball_detection_r()
 
-        #clean up null tuples in the list
-        # print "ball_r_bbox_lst", ball_r_bbox_lst
-        # print "ball_l_bbox_lst", ball_l_bbox_lst
+        # clean up null tuples in the list
         # ball_l_bbox_lst = [x for x in ball_l_bbox_lst if x]
         # ball_r_bbox_lst = [x for x in ball_r_bbox_lst if x]
 
-        ball_l_bbox_lst = [x for x in miro_l_bbox_lst if x]
-        ball_r_bbox_lst = [x for x in miro_r_bbox_lst if x]
+        # clean up null tuples in the list 清除空元组在列表中
+        l_bbox_lst = [x for x in miro_l_bbox_lst if x]  # detected bbox on the left camera 
+        r_bbox_lst = [x for x in miro_r_bbox_lst if x]  # detected bbox on the right camera 
 
-        if len(ball_r_bbox_lst) != 0 and len(ball_l_bbox_lst) != 0:
-            r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
-            l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
+        if len(r_bbox_lst) != 0 and len(l_bbox_lst) != 0:
+            r_bbox = data_resolver.box_resolver(r_bbox_lst)
+            l_bbox = data_resolver.box_resolver(l_bbox_lst)
             l_angle_lst , r_angle_lst, r_angular_vel, l_angular_vel = main.init_tracker(l_bbox, r_bbox,l_output, r_output)
 
-        elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) != 0:
+        elif len(r_bbox_lst) == 0 and len(l_bbox_lst) != 0:
             print("No targets at the right side, activate tracking left side.")
-            l_bbox = data_resolver.box_resolver(ball_l_bbox_lst)
+            l_bbox = data_resolver.box_resolver(l_bbox_lst)
             angular_vel , angle_lst = main.init_tracker_s(l_bbox, l_output, 0)
 
-        elif len(ball_r_bbox_lst) !=0 and len(ball_l_bbox_lst) == 0:
+        elif len(r_bbox_lst) !=0 and len(l_bbox_lst) == 0:
             print("No targets at the left side, activate tracking right side.")	
-            r_bbox = data_resolver.box_resolver(ball_r_bbox_lst)
+            r_bbox = data_resolver.box_resolver(r_bbox_lst)
             angular_vel , angle_lst = main.init_tracker_s(r_bbox, r_output, 1)
 
-        elif len(ball_r_bbox_lst) == 0 and len(ball_l_bbox_lst) == 0:
+        elif len(r_bbox_lst) == 0 and len(l_bbox_lst) == 0:
             print("No targets at two sides.")
         
         #for testing the controlling module.
