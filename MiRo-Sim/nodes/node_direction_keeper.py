@@ -163,12 +163,12 @@ class DirectionKeeper:
                 slow: the slow mode to choose or not, True is slow mode.
         '''
         if slow:
-            spin = 6.2832 * 0.5  # 6.2832 is two pi(3.141592), 0.1 is the speed gain.
+            spin = 6.2832 * 0.1  # 6.2832 is two pi(3.141592), 0.1 is the speed gain.
             # spin = math.radians(angle) *4
             v = angle/90 #using the
 
         else:
-            spin = 6.2832 * 1.2  # 6.2832 is two pi(3.141592), 0.7 is the speed gain.
+            spin = 6.2832 * 0.7  # 6.2832 is two pi(3.141592), 0.7 is the speed gain.
             # spin = math.radians(angle) * 8
             v = angle/90
 
