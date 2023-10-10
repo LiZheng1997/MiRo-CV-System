@@ -18,6 +18,7 @@ from sensor_msgs.msg import CompressedImage
 from node_direction_keeper import *
 from geometry_msgs.msg import Pose2D,Vector3
 from safety_control import *
+from utils import data_resolver
 
 class Tracker:
 
@@ -36,7 +37,7 @@ class Tracker:
 		# Create object to convert ROS images to OpenCV format
 		self.image_converter = CvBridge()
 		self.direction_keeper = DirectionKeeper(self.topic_root)
-		self.data_resolver = DataResolver()
+		self.data_resolver = data_resolver.DataResolver()
 		self.global_planner = node_path_planning.PathPlanner(name)
 		self.is_activated = True
 		self.safety_controller = SafetyController(name)

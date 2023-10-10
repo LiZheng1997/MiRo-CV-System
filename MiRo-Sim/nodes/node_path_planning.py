@@ -18,7 +18,7 @@ import cv2
 from cv_bridge import CvBridge, CvBridgeError
 from node_detector import *
 from transform import *
-from data_resolver import *
+from utils import data_resolver
 
 import node_change_kc
 
@@ -36,7 +36,7 @@ class PathPlanner:
 		self.dfovea_WORLD = []
 		self.kc_updater = node_change_kc.ChangeKc(name)
 		self.transformer = Transformer(name)
-		self.data_resolver = DataResolver()
+		self.data_resolver = data_resolver.DataResolver()
 		self.kinematic_joints = np.array([])
 		#get the loc of sonar on head.
 		self.fovea_HEAD = miro.lib.get("LOC_SONAR_FOVEA_HEAD")

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from node_detector import * 
-from data_resolver import *
+from utils import data_resolver
 import miro2 as miro
 import rospy
 from geometry_msgs.msg import TwistStamped
@@ -16,7 +16,7 @@ class DirectionKeeper:
 		self.topic_root = name
 		self.velocity = TwistStamped()
 		# self.detector = Detector()
-		self.data_resolver = DataResolver()
+		self.data_resolver = data_resolver.DataResolver()
 		self.velocity_pub = rospy.Publisher(self.topic_root + "control/cmd_vel", TwistStamped, queue_size=1)
 		#self.cam_model = miro.utils.CameraModel()
 		self.transformer = Transformer(name)
