@@ -4,7 +4,7 @@ from utils import data_resolver
 import miro2 as miro
 import rospy
 from geometry_msgs.msg import TwistStamped
-from transform import * 
+import transform
 import numpy as np
 import time
 import math
@@ -20,7 +20,7 @@ class DirectionKeeper:
         self.velocity_pub = rospy.Publisher(self.topic_root + "control/cmd_vel",
                                                 TwistStamped, queue_size=1)
         #self.cam_model = miro.utils.CameraModel()
-        self.transformer = Transformer(name)
+        self.transformer = transform.Transformer(name)
         self.active = True
 
     #这里存在一个隐形的问题，我这里设计的时候是希望，从detection的5帧画面中计算一个平均的发现的物体的
