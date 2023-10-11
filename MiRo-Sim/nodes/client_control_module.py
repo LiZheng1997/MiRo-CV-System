@@ -307,7 +307,9 @@ if __name__ == "__main__":
     # Painting the diagram for viewing the process of angle and angular vel
     fig = plt.figure()
     ax1 = fig.add_subplot(1,2,1)
-    ax1.plot(angle_lst,angular_vel,':')
+    ax1.plot(angular_vel,angle_lst, ':')
+    plt.xlabel('Angular Velocity')
+    plt.ylabel('Angle Correction')
     plt.show()
 
 
