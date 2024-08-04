@@ -14,6 +14,7 @@ The master branch is the official released version, and the core version is the 
 
 **2023-09** ROS Noetic is supported now!
 
+**2023-09** The first version is released.
 
 
 # Requirements
