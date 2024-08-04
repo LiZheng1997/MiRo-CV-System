@@ -1,15 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 #
-#   @section COPYRIGHT
-#   Copyright (C) 2023 Neurons Vision Ltd
-#
-#   @section AUTHOR
-#   Neuros Vision https://www.neuronsvision.com
-#
-#   @section LICENSE
-#
-#
 #
 #   #############################################################################
 #   # This is the core version of my previous dissertation project.             #
@@ -267,20 +258,22 @@ if __name__ == "__main__":
         # the distance between the robot and the target or other objects is less than 0.15,
         main.is_activated = main.init_safety_controller()
         # MiRo detection block, ouput the detected bbox and the output image
-        miro_l_bbox_lst, l_output = main.init_miro_detection_l()
-        miro_r_bbox_lst, r_output = main.init_miro_detection_r()
+        # miro_l_bbox_lst, l_output = main.init_miro_detection_l()
+        # miro_r_bbox_lst, r_output = main.init_miro_detection_r()
 
         # Ball detection block
-        # ball_l_bbox_lst, l_output = main.init_ball_detection_l()
-        # ball_r_bbox_lst, r_output= main.init_ball_detection_r()
+        ball_l_bbox_lst, l_output = main.init_ball_detection_l()
+        ball_r_bbox_lst, r_output= main.init_ball_detection_r()
 
         # clean up null tuples in the list
         # ball_l_bbox_lst = [x for x in ball_l_bbox_lst if x]
         # ball_r_bbox_lst = [x for x in ball_r_bbox_lst if x]
+        l_bbox_lst = [x for x in ball_l_bbox_lst if x]
+        r_bbox_lst = [x for x in ball_r_bbox_lst if x]
 
         # clean up null tuples in the list 清除空元组在列表中
-        l_bbox_lst = [x for x in miro_l_bbox_lst if x]  # detected bbox on the left camera
-        r_bbox_lst = [x for x in miro_r_bbox_lst if x]  # detected bbox on the right camera
+        # l_bbox_lst = [x for x in miro_l_bbox_lst if x]  # detected bbox on the left camera
+        # r_bbox_lst = [x for x in miro_r_bbox_lst if x]  # detected bbox on the right camera
 
         if len(r_bbox_lst) != 0 and len(l_bbox_lst) != 0:
             r_bbox = data_resolver.box_resolver(r_bbox_lst)
@@ -305,12 +298,12 @@ if __name__ == "__main__":
             break
 
     # Painting the diagram for viewing the process of angle and angular vel
-    fig = plt.figure()
-    ax1 = fig.add_subplot(1,2,1)
-    ax1.plot(angular_vel,angle_lst, ':')
-    plt.xlabel('Angular Velocity')
-    plt.ylabel('Angle Correction')
-    plt.show()
+    # fig = plt.figure()
+    # ax1 = fig.add_subplot(1,2,1)
+    # ax1.plot(angular_vel,angle_lst, ':')
+    # plt.xlabel('Angular Velocity')
+    # plt.ylabel('Angle Correction')
+    # plt.show()
 
 
 
