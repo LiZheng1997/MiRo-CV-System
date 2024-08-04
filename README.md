@@ -57,7 +57,7 @@ In this system, I implemented two kinds of braitenberg vehicles, **2b (aggressio
 </div>
 
 <div align=center>
-<img src="assets\mage-20240804165358095.png" alt="3a" style="zoom:67%;" />
+<img src="assets\image-20240804165358095.png" alt="3a" style="zoom:67%;" />
 </div>
 
 ### 2.2 The Kinematics of interception task
