@@ -41,7 +41,7 @@ Any contributions are welcomed, if you love playing with MiRo robots, you can us
 
 ## 1. Background
 
-First of all, this project is my Master's dissertation project in 2019, now I uploaded all codes and more improvements will be implemented in the future. All relevant resources will be uploaded, including training sample images and model files. You can find some model files in the root path of this repo, a fold named ***models***. Training sample images can be found here: xxx
+First of all, this project is my Master's dissertation project in 2019, now I uploaded all codes and more improvements will be implemented in the future. All relevant resources will be uploaded, including training sample images and model files. You can find some model files in the root path of this repo, a fold named ***models***. Training sample images can be found here: [Google Drive](https://drive.google.com/drive/folders/1owF3loF_p_iO_xP7X3yBjYI6e0c9NLm3?usp=sharing)
 
 
 
