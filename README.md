@@ -52,22 +52,25 @@ This CV system is mainly based on **OpenCV library**, which uses some convention
 ### 2.1 Braitenberg vehicles
 
 In this system, I implemented two kinds of braitenberg vehicles, **2b (aggression) vehicle** and **3a (love) vehicle**,   you can find these two types in following two pictures.
-
+<div align=center>
 <img src="assets\image-20240804165037267.png" alt="2b" style="zoom:67%;" />
+</div>
 
-
-
-![3a](assets\image-20240804165358095.png)
+<div align=center>
+<img src="assets\mage-20240804165358095.png" alt="3a" style="zoom:67%;" />
+</div>
 
 ### 2.2 The Kinematics of interception task
 
 The first picture shows the kinematic model about that a miro robot wants to intercept another miro robot.
-
+<div align=center>
 <img src="assets\image-20240804171420804.png" alt="kinematic model" style="zoom: 67%;" />
+</div>
 
 The second picture shows a similar interception geometry explanation.
-
+<div align=center>
 <img src="assets\image-20240804172129418.png" alt="image-20240804172129418" style="zoom: 67%;" />
+</div>
 
 
 
