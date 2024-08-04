@@ -49,6 +49,28 @@ First of all, this project is my Master's dissertation project in 2019, now I up
 
 This CV system is mainly based on **OpenCV library**, which uses some conventional computer vision algorithms, like **Hough circle detection**, **Gaussian filter**, **Median filter**, **Optical flow estimation** and **stereo camera depth calculation**, etc. Also, **Deep Neural Network models** are used in this project to achieve real time detection.  Apart from perception algorithms, a **bio-inspired method** is also designed in this system using a end-to-end paradigm, it refers to the famous **[Braitenberg vehicle](https://en.wikipedia.org/wiki/Braitenberg_vehicle) theory**. Path planning module and Localization module are not added into this system yet now.
 
+### 2.1 Braitenberg vehicles
+
+In this system, I implemented two kinds of braitenberg vehicles, **2b (aggression) vehicle** and **3a (love) vehicle**,   you can find these two types in following two pictures.
+
+<img src="assets\miro\image-20240804165037267.png" alt="2b" style="zoom:67%;" />
+
+
+
+![3a](assets\miro\image-20240804165358095.png)
+
+### 2.2 The Kinematics of interception task
+
+The first picture shows the kinematic model about that a miro robot wants to intercept another miro robot.
+
+<img src="assets\miro\image-20240804171420804.png" alt="kinematic model" style="zoom: 67%;" />
+
+The second picture shows a similar interception geometry explanation.
+
+<img src="assets\miro\image-20240804172129418.png" alt="image-20240804172129418" style="zoom: 67%;" />
+
+
+
 
 
 ## 3. Framework
@@ -126,3 +148,20 @@ All codes are implemented based on doing self-learning roughly in 5 months. Nece
 - [ ] Add and test the Visual Odometry node
 - [ ] Add the path planning module into the system for comparation
 - [ ] update previous bio-inspired and RL methods
+
+
+
+## More about MiRo Robot
+
+If you want to know more about this biomimetic MiRo robot, please click this [link](https://www.miro-e.com/robot) to find more on their official websites.
+
+
+
+## References
+
+[1] Belkhouche, F. and Belkhouche, B., 2004, December. On the tracking and interception of a moving object by a wheeled mobile robot. In *IEEE Conference on Robotics, Automation and Mechatronics, 2004.* (Vol. 1, pp. 130-135). IEEE.
+
+[2] Headleand, C.J. and Teahan, W., 2016, July. Towards ethical robots: Revisiting Braitenberg's vehicles. In *2016 SAI Computing Conference (SAI)* (pp. 469-477). IEEE.
+
+[3] Application of Computer Vision for A Biomimetic Robot
+
