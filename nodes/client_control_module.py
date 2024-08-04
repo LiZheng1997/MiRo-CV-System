@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding:utf-8 -*-
 #
-#
 #   #############################################################################
 #   # This is the core version of my previous dissertation project.             #
 #   # This project is designed for off-board deployment or the simulator.       #
@@ -56,9 +55,11 @@ class ControlNode:
     def __init__(self, name):
         # global topic_root
         # self.pars = pars.CorePars()
-        # set the robot name
-        # topic_root = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
-        topic_root = "/" + name + "/"
+
+        # initial setup of the robot name, you need to source the mdk/setup.bash before runing
+        topic_root = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
+        # topic_root = "/" + name + "/"
+
         self.is_activated = True # The default safety range control is opened, so the default value is True.
 
         #Initinalize some essential instances.
