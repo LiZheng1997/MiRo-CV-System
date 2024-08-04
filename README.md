@@ -1,83 +1,128 @@
 # MiRo-CV-System
 
-This is my first version of an autonomous visual system which is purely based on using OpenCV APIs, and the final aim of this project is to intercepting another moving target. I defined three targets, named pedestrians, another MiRo robot and MiRo toy ball in this project. There are three scenarios for different deploying methods. One is deploying on-board, and the other two are deploying off-board or in simulator (Gazebo).  Some codes are inspired from code samples in the MDK-2019 version. Thanks for their brilliant work on building MiRo robots. I am also one of the big fan loving biomimetic robots.
+This is my first version of an bio-inspired visual system which is based on OpenCV APIs and ANN, and the final aim of this project is intercepting a moving target. I pre-defined **three targets**, named pedestrians, MiRo robots and MiRo toy balls. In total, there are three scenarios for different deploying situations, like on-board;  off-board and in a simulator (Gazebo). Some codes are inspired from **code samples** in the MDK-2019 version. Thanks for their brilliant work on building MiRo robots. I am also one of the big fan loving biomimetic robots. Link: http://labs.consequentialrobotics.com/miro-e/docs/index.php?page=Introduction
+
+***Branches Notes:*** 
+
+The master branch is the official released version, and the core version is the core part of this system, also the dev branch contains all developed codes.
+
+[TOC]
+
+# News
+
+**2023-10** MDK-20230105 is supported now!
+
+**2023-09** ROS Noetic is supported now!
 
 
 
-## Background
+# Requirements
 
-At the begining, this project is my Master's dissertation project in 2019, now I uploaded all codes and more improvements will be implemneted in the future. All relevant resources will be uploaded, including training sample images and model files.
+## Software
 
+1. Ubuntu20.04
+2. ROS Noetic
+3. MiRo MDK 20230105
+4. OpenCV > 3.4
+5. Python
 
+## Hardware
 
-## Methods
-
-This CV system is mainly based on OpenCV library, which uses some conventional computer vision algorithms, like Hough circle detection, Gaussian filter, Median filter, Optical flow estimation and stereo camera depth calculation, etc. Also, DNN models are used in this project to achieve real time detection through Depth Learning technologies.  
-
-
-
-### Detector Node
-
-#### MiRo Detection Module
-
-which utilizes the detection module based on CascadeClassifier, the classifier model is trained using collected indoor MiRo robot data. Positive sample is a MiRo robot in the image, negative sample is some other things in indoor environment.
-
-Hence, this cascade classifier needs to judge whether there is a MiRo robot in images. 
+1. a MiRo robot
+2. a Laptop with GPU card is better
 
 
 
-#### Ball Detection Module
+# Contribution
 
-This module is based on the Hough circle detection in opencv lib. Therefore, this module is tend to use in a Gazebo simulator, as the real world environment is too noisy for this algorithm, and the effect of detection is unstable. 
-
-
-
-#### Pedestrian Detection Module
-
-This module is based on the dnn module in opencv lib. Using some traditional CNN model, like darknet, faster-rcnn and yolo, to achieve pedestrian detection in real world with considerable latency. 
+Any contributions are welcomed, if you love playing with MiRo robots, you can use this repo as a good start of applying computer vision algorithms on a [Biomimetic ](https://en.wikipedia.org/wiki/Biomimetics) robot.
 
 
 
-### Tracker Node
+## 1. Background
 
-#### Single-Tracking Module
-
-This module is based on the tracker api in opencv. There are 8 trackers in total after opencv3.4 version. So, if you want to use this project, you have to use a higher version than opecnv-3.4, or some unexpected errors will be produced. TLD tracker is the one I prefer to use in indoor environment with occlusion situation.
-
-### Multi-Tracking Module
-
-This module is based on the multitracker api in opencv.
+First of all, this project is my Master's dissertation project in 2019, now I uploaded all codes and more improvements will be implemented in the future. All relevant resources will be uploaded, including training sample images and model files. You can find some model files in the root path of this repo, a fold named ***models***. Training sample images can be found here: [Google Drive](https://drive.google.com/drive/folders/1owF3loF_p_iO_xP7X3yBjYI6e0c9NLm3?usp=sharing)
 
 
 
-### Control Node
+## 2. Methods
 
-Control node contains a direction keeper node, this is the main function for maintaining the direction of a MiRo robot. 
-
-#### Orientation Control Module
-
-This module is based on a designed orientation correction algorithms. Orientation errors is calculated based on the angle variation  between the viewline and the ego-to-target line. Hence, MiRo robot will be driven to point its head towards the target and keep following the target, then it can intercept this moving target with considerable higher linear velocity. Angular velocity will be corrected based on the angle variation mentioned before. 
-
-#### Safety Controller Module
-
-This module is based on the sonar sensor on the MiRo's nose. I use the data from sonar sensor to estimate the distance between the target and the MiRo. This is not accurate enough in real time tests. 
+This CV system is mainly based on **OpenCV library**, which uses some conventional computer vision algorithms, like **Hough circle detection**, **Gaussian filter**, **Median filter**, **Optical flow estimation** and **stereo camera depth calculation**, etc. Also, **Deep Neural Network models** are used in this project to achieve real time detection.  Apart from perception algorithms, a **bio-inspired method** is also designed in this system using a end-to-end paradigm, it refers to the famous **[Braitenberg vehicle](https://en.wikipedia.org/wiki/Braitenberg_vehicle) theory**. Path planning module and Localization module are not added into this system yet now.
 
 
 
-### Path Planning Node
+## 3. Framework
 
-#### Path planning Module
+### 3.1 Detector Module
 
-Global path planning and Local path planning are designed for intercepting another moving target. Kinematic model is necessary for this module to work smoothly in real time.
+#### 3.1.1. MiRo Detection Node
+
+This miro robot detection node is based on Cascade Classifier, the classifier model is trained using collected indoor MiRo robots' appearance data. A positive sample is a MiRo robot in the center of an image , a negative sample is some other indoor objects in a lab. Hence, this cascade classifier needs to predict whether there is a MiRo robot in one frame.
+
+#### 3.1.2. Ball Detection Node
+
+This node is based on the **Hough Circle** detection in the OpenCV lib. And this node might  better use in a Gazebo simulator for showing a better effect. The reason is that the real world environment is sometimes too noisy for this detection algorithm to work well, the effect of detection is unstable.
+
+#### 3.1.3. Pedestrian Detection Node
+
+This node is based on a DNN module in the OpenCV lib or independent models. Using some traditional CNN model, like darknet, faster-rcnn and yolov3, to achieve the functionality of pedestrian detection in real world with a considerable latency.
+
+### 3.2 Tracker Module
+
+#### 3.2.1. Single-Tracking Node
+
+This node is based on the tracker APIs in OpenCV . There are 8 trackers in total after opencv3.4 version. So, if you want to use this project, you have to use a higher or equal version than opecnv3.4, or some unexpected errors might encounter. The TLD tracker is the one I prefer to use in indoor environment with occlusion situation.
+
+#### 3.2.2. Multi-Tracking Node
+
+This node is based on the multitracker API in OpenCV.
+
+### 3.3 Control Module
+
+The Control module contains a direction keeper node, this is the main function for maintaining the yaw angle of a MiRo robot.
+
+#### 3.3.1. Orientation Control Node
+
+This node is based on a designed **bio-inspired** orientation correction algorithms. Orientation errors are calculated based on the yaw angle variations between the view line and the ego-to-target line. Hence, the MiRo robot will be driven to point its head towards the target and keep following the target, then it can intercept this moving target with considerable higher linear velocity. Moreover, the angular velocity will be produced based on the angle variation mentioned before.
+
+#### 3.3.2. Safety Controller Node
+
+This node is based on a sonar sensor on the MiRo robot's nose. I use the raw data from the sonar sensor to estimate the distance between the target and the MiRo robot. This is not accurate enough in real time tests.
+
+### 3.4. Path Planning Module
+
+#### 3.4.1. Path planning Node
+
+Global path planning and Local path planning are designed for generating paths of intercepting another moving target. A kinematic model is necessary for this node to work smoothly in real time. But, in this version, I did not add path planning module to produce real time planning paths. Instead, I merely use aforementioned Orientation Control module to implement a bio-inspired way of approaching a moving target without applying a planning method.
+
+### 3.5 Localization Module
+
+#### 3.5.1. Kalman Filter Pose Estimation Node
+
+Using last second pose and utilize Kalman Filter to predict the current ego pose. Still, this node is not added to the first version, because the objective of using a pose estimation node is utilized in the path planning module.
+
+#### 3.5.2. Wheel Odometry Node
+
+This wheel odometry node is mainly designed for localizing the MiRo robot's global position, but accumulated errors should be considered and drift issue might need be solved.
+
+#### 3.5.3. Visual Odometry Node
+
+This visual odometry node is used for improving the localization accuracy, and it will be fused with wheel odometry to generate a more accurate global position.
 
 
 
-#### Kalman Filter Pose Estimation Module
-
-Using last second pose and utilize Kalman Filter to predict the current ego pose. 
-
-
-
-## Summary
+## 4. Summary
 
 All codes are implemented based on doing self-learning roughly in 5 months. Necessary knowledge includes ROS, Computer Vision basic theories, OpenCV APIs, Physical Robots' experiments, Linux system, Machine Learning, Math analysis on kinematic models and so on.
+
+
+
+## TODO
+
+- [x] Simplify codes to a core version
+- [x] Update the compatible ROS version to ROS1 Noetic version
+- [x] Update the MDK version to MDK202301
+- [ ] Add and test the Wheel Odometry node
+- [ ] Add and test the Visual Odometry node
+- [ ] Add the path planning module into the system for comparation
+- [ ] update previous bio-inspired and RL methods
