@@ -17,12 +17,11 @@ from sensor_msgs.msg import JointState, BatteryState, Imu, Range, CompressedImag
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
-#from matplotlib import pyplot as plt
-# from transform import *
 
 
 """Using normal OpenCV APIs to implement detection modules, so I call it Normal detector, and there is another
 modeule called CNN detector, this module will use neural network models to implement detections."""
+
 class NormalDetector:
 
 	def __init__ (self,name):
@@ -47,7 +46,7 @@ class NormalDetector:
 		self.image_converter = CvBridge()
 		# self.transformer = Transformer(name)
 		self.cam_left_sub = rospy.Subscriber(
-			self.topic_root + "sensors/caml/compressed", CompressedImage,  self.cam_left_callback,queue_size=1,buff_size=52428800)
+			self.topic_root + "sensors/caml/compressed", CompressedImage, self.cam_left_callback,queue_size=1,buff_size=52428800)
 		self.cam_right_sub = rospy.Subscriber(
 			self.topic_root + "sensors/camr/compressed", CompressedImage, self.cam_right_callback,queue_size=1,buff_size=52428800)
 
@@ -342,7 +341,6 @@ class NormalDetector:
 		# cv2.destroyAllWindows()
 		return bbox_lst_l , outputl
 
-
 	def detect_balls_r(self,colour_str):
 		count = 0
 		# circle_pos_r = np.array([],dtype=UInt16)
@@ -372,6 +370,7 @@ class NormalDetector:
 		lower_bound = np.array([target_hue-20, 100, 100])
 		upper_bound = np.array([target_hue+20, 255, 255])
 		max_circle_norm = [None, None, None]
+		
 		while True:
 			#get a copy of the raw image without being processed.
 			time.sleep(0.1)
