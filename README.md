@@ -6,7 +6,37 @@ This is my first version of an bio-inspired visual system which is based on Open
 
 The master branch is the official released version, and the core version is the core part of this system, also the dev branch contains all developed codes.
 
-[TOC]
+- [MiRo-CV-System](#miro-cv-system)
+- [News](#news)
+- [Requirements](#requirements)
+  - [Software](#software)
+  - [Hardware](#hardware)
+- [Contribution](#contribution)
+  - [1. Background](#1-background)
+  - [2. Methods](#2-methods)
+    - [2.1 Braitenberg vehicles](#21-braitenberg-vehicles)
+    - [2.2 The Kinematics of interception task](#22-the-kinematics-of-interception-task)
+  - [3. Framework](#3-framework)
+    - [3.1 Detector Module](#31-detector-module)
+      - [3.1.1. MiRo Detection Node](#311-miro-detection-node)
+      - [3.1.2. Ball Detection Node](#312-ball-detection-node)
+      - [3.1.3. Pedestrian Detection Node](#313-pedestrian-detection-node)
+    - [3.2 Tracker Module](#32-tracker-module)
+      - [3.2.1. Single-Tracking Node](#321-single-tracking-node)
+      - [3.2.2. Multi-Tracking Node](#322-multi-tracking-node)
+    - [3.3 Control Module](#33-control-module)
+      - [3.3.1. Orientation Control Node](#331-orientation-control-node)
+      - [3.3.2. Safety Controller Node](#332-safety-controller-node)
+    - [3.4. Path Planning Module](#34-path-planning-module)
+      - [3.4.1. Path planning Node](#341-path-planning-node)
+    - [3.5 Localization Module](#35-localization-module)
+      - [3.5.1. Kalman Filter Pose Estimation Node](#351-kalman-filter-pose-estimation-node)
+      - [3.5.2. Wheel Odometry Node](#352-wheel-odometry-node)
+      - [3.5.3. Visual Odometry Node](#353-visual-odometry-node)
+  - [4. Summary](#4-summary)
+  - [TODO](#todo)
+  - [More about MiRo Robot](#more-about-miro-robot)
+  - [References](#references)
 
 # News
 
