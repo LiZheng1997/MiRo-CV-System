@@ -2,7 +2,7 @@
 import numpy as np
 import copy
 import miro2 as miro
-import node_change_kc
+import miro_cv.nodes.node_change_kc as node_change_kc
 import rospy
 from sensor_msgs.msg import JointState
 

@@ -1,6 +1,23 @@
 # MiRo-CV-System
 
-This is my first version of an bio-inspired visual system which is based on OpenCV APIs and ANN, and the final aim of this project is intercepting a moving target. I pre-defined **three targets**, named pedestrians, MiRo robots and MiRo toy balls. In total, there are three scenarios for different deploying situations, like on-board;  off-board and in a simulator (Gazebo). Some codes are inspired from **code samples** in the MDK-2019 version. Thanks for their brilliant work on building MiRo robots. I am also one of the big fan loving biomimetic robots. Link: http://labs.consequentialrobotics.com/miro-e/docs/index.php?page=Introduction
+This is my first version of an bio-inspired visual system which is based on OpenCV APIs and ANN, and the final aim of this project is intercepting a moving target. I pre-defined **three targets**, named pedestrians, MiRo robots and MiRo toy balls. In total, there are three scenarios for different deploying situations, like on-board;  off-board and in a simulator (Gazebo). Some codes are inspired from **code samples** in the MDK-2019 version. Thanks for their brilliant work on building MiRo robots. I am also one of the big fan loving [biomimetic ](https://en.wikipedia.org/wiki/Biomimetics) robots. Link: http://labs.consequentialrobotics.com/miro-e/docs/index.php?page=Introduction
+
+**Demo1**(intercepting_ball):
+
+
+https://github.com/user-attachments/assets/e40b4b14-01dd-4721-882a-032114d49827
+
+**Demo2**(intercepting_miro_without_safety_control)
+
+https://github.com/user-attachments/assets/b8287cf4-107c-41ef-ab00-4e6006fa9c54
+
+**Demo3**(intercepting_miro_real_world)
+
+https://github.com/user-attachments/assets/22280969-d234-42e9-8bf1-78218282ab04
+
+**Demo4**(intercepting_pedestrian_real_world)
+
+https://github.com/user-attachments/assets/27777dc7-73cb-4ded-9c11-af9d9ba88df4
 
 ***Branches Notes:*** 
 
@@ -11,7 +28,7 @@ The master branch is the official released version, and the core version is the 
 - [Requirements](#requirements)
   - [Software](#software)
   - [Hardware](#hardware)
-- [Contribution](#contribution)
+  - [Start miro\_cv Node](#start-miro_cv-node)
   - [1. Background](#1-background)
   - [2. Methods](#2-methods)
     - [2.1 Braitenberg vehicles](#21-braitenberg-vehicles)
@@ -36,6 +53,7 @@ The master branch is the official released version, and the core version is the 
   - [4. Summary](#4-summary)
   - [TODO](#todo)
   - [More about MiRo Robot](#more-about-miro-robot)
+  - [Contribution](#contribution)
   - [References](#references)
 
 # News
@@ -61,13 +79,12 @@ The master branch is the official released version, and the core version is the 
 1. a MiRo robot
 2. a Laptop with GPU card is better
 
-
-
-# Contribution
-
-Any contributions are welcomed, if you love playing with MiRo robots, you can use this repo as a good start of applying computer vision algorithms on a [Biomimetic ](https://en.wikipedia.org/wiki/Biomimetics) robot.
-
-
+## Start miro_cv Node
+```
+$ cd your_workspace && catkin_make
+$ source devel/setup.bash
+$ rosrun miro_cv client_control_module.py
+```
 
 ## 1. Background
 
@@ -83,7 +100,7 @@ This CV system is mainly based on **OpenCV library**, which uses some convention
 
 In this system, I implemented two kinds of braitenberg vehicles, **2b (aggression) vehicle** and **3a (love) vehicle**,   you can find these two types in following two pictures.
 <div align=center>
-<img src="assets\image-20240804165037267.png" alt="2b" style="zoom:50%;" />
+<img src="assets\image-20240805133159394.png" alt="2b" style="zoom:60%;" />
 </div>
 
 <div align=center>
@@ -188,6 +205,9 @@ All codes are implemented based on doing self-learning roughly in 5 months. Nece
 
 If you want to know more about this biomimetic MiRo robot, please click this [link](https://www.miro-e.com/robot) to find more on their official websites.
 
+## Contribution
+
+Any contributions are welcomed, if you love playing with MiRo robots, you can use this repo as a good start of applying computer vision algorithms on a [Biomimetic ](https://en.wikipedia.org/wiki/Biomimetics) robot.
 
 
 ## References

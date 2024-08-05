@@ -18,11 +18,11 @@ from sensor_msgs.msg import JointState, BatteryState, Imu, Range, CompressedImag
 #Open CV
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-from node_detector import *
-from transform import *
-from utils import data_resolver
+from miro_cv.nodes.node_detector import *
+from miro_cv.nodes.transform import *
+from miro_cv.utils import data_resolver
 
-import node_change_kc
+import nodes.node_change_kc as node_change_kc
 
 class PathPlanner:
 

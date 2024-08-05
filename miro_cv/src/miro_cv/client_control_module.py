@@ -30,7 +30,7 @@ import rospy
 import sensor_msgs
 import std_msgs
 import geometry_msgs
-import pars  # 注意这个pars的包内包含的所有的机器人的传感器相关的参数。
+from miro_cv.nodes import pars # 注意这个pars的包内包含的所有的机器人的传感器相关的参数
 import multiprocessing as mp
 import time
 
@@ -39,44 +39,31 @@ import time
 # support the control module.
 import miro2 as miro
 from cv_bridge import CvBridge # 使用CvBridge进行opencv和ros的图像信息进行转换。
-from node_detector import *
-from kc_initiate import *
-from node_path_planning import *
-import utils
-from node_direction_keeper import *
-from node_tracker import *
-from node_CNN_detector import *
-from node_multitracker import *
-from safety_control import *
+from miro_cv.nodes.node_detector import*
+from miro_cv.nodes.kc_initiate import *
+from miro_cv.nodes.node_path_planning import *
+import miro_cv.utils as utils
+from miro_cv.nodes.node_direction_keeper import *
+from miro_cv.nodes.node_tracker import *
+from miro_cv.nodes.node_CNN_detector import *
+from miro_cv.nodes.node_multitracker import *
+from miro_cv.nodes.safety_control import *
 import matplotlib.pyplot as plt
 
-class ControlNode:
+class MainNode:
 
     def __init__(self, name):
-        # global topic_root
-        # self.pars = pars.CorePars()
-
         # initial setup of the robot name, you need to source the mdk/setup.bash before runing
-        topic_root = "/" + os.getenv("MIRO_ROBOT_NAME") + "/"
-        # topic_root = "/" + name + "/"
-
+        topic_root = "/" + name + "/"
         self.is_activated = True # The default safety range control is opened, so the default value is True.
-
         #Initinalize some essential instances.
         self.kc = Kc_init(topic_root)
-
         self.detector = NormalDetector(topic_root)
-        
         self.path = PathPlanner(topic_root)
-
         self.tracker = Tracker(topic_root)
-
         self.multiTracker = MultiTracker(topic_root)
-
         self.direction_keeper = DirectionKeeper(topic_root)
-
         self.NN_detector = NN_detector(topic_root)
-
         self.safety_controller = SafetyController(topic_root)
 
     def init_balls_detection_l(self):
@@ -142,7 +129,6 @@ class ControlNode:
         return self.is_activated
 
 
-
     # The following functions are some neural network models can be used and tested in this system.
     # Some functions are still in the testing stage, I will use a stable model in the following main function later.
     # Every camera will initiate the neural network model once.
@@ -206,16 +192,14 @@ class ControlNode:
         self.path.init_pos()
 
 
-
 # The main function of this control system
 if __name__ == "__main__":
     # init ROS
-    rospy.init_node(os.getenv("MIRO_ROBOT_NAME") + "_client_demo") # log_level=self.pars.ros.log_level
-    print (os.getenv("MIRO_ROBOT_NAME") + "_client_demo")
-    pars = pars.CorePars()
+    pars = pars.CorePars() # init the miro_robot_name using default value
     topic_base_name = pars.ros.robot_name
-    # main = ControlNode("miro")
-    main = ControlNode(topic_base_name)
+    rospy.init_node(topic_base_name + "_client_demo") # log_level=self.pars.ros.log_level
+    print ("<<<<Starting the " + topic_base_name + "_client_demo !!!>>>>")
+    main = MainNode(topic_base_name)
     main.init_kinematic()# Initiate the kinematic status of MiRo
 
     # ######################################################################## #
@@ -259,22 +243,20 @@ if __name__ == "__main__":
         # the distance between the robot and the target or other objects is less than 0.15,
         main.is_activated = main.init_safety_controller()
         # MiRo detection block, ouput the detected bbox and the output image
-        # miro_l_bbox_lst, l_output = main.init_miro_detection_l()
-        # miro_r_bbox_lst, r_output = main.init_miro_detection_r()
+        miro_l_bbox_lst, l_output = main.init_miro_detection_l()
+        miro_r_bbox_lst, r_output = main.init_miro_detection_r()
 
         # Ball detection block
-        ball_l_bbox_lst, l_output = main.init_ball_detection_l()
-        ball_r_bbox_lst, r_output= main.init_ball_detection_r()
+        # ball_l_bbox_lst, l_output = main.init_ball_detection_l()
+        # ball_r_bbox_lst, r_output= main.init_ball_detection_r()
 
         # clean up null tuples in the list
-        # ball_l_bbox_lst = [x for x in ball_l_bbox_lst if x]
-        # ball_r_bbox_lst = [x for x in ball_r_bbox_lst if x]
-        l_bbox_lst = [x for x in ball_l_bbox_lst if x]
-        r_bbox_lst = [x for x in ball_r_bbox_lst if x]
+        # l_bbox_lst = [x for x in ball_l_bbox_lst if x]
+        # r_bbox_lst = [x for x in ball_r_bbox_lst if x]
 
         # clean up null tuples in the list 清除空元组在列表中
-        # l_bbox_lst = [x for x in miro_l_bbox_lst if x]  # detected bbox on the left camera
-        # r_bbox_lst = [x for x in miro_r_bbox_lst if x]  # detected bbox on the right camera
+        l_bbox_lst = [x for x in miro_l_bbox_lst if x]  # detected bbox on the left camera
+        r_bbox_lst = [x for x in miro_r_bbox_lst if x]  # detected bbox on the right camera
 
         if len(r_bbox_lst) != 0 and len(l_bbox_lst) != 0:
             r_bbox = data_resolver.box_resolver(r_bbox_lst)

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from node_detector import * 
-from utils import data_resolver
+from miro_cv.nodes.node_detector import * 
+from miro_cv.utils import data_resolver
 import miro2 as miro
 import rospy
 from geometry_msgs.msg import TwistStamped
-import transform
+import miro_cv.nodes.transform as transform
 import numpy as np
 import time
 import math
