@@ -28,6 +28,7 @@ The master branch is the official released version, and the core version is the 
 - [Requirements](#requirements)
   - [Software](#software)
   - [Hardware](#hardware)
+  - [Start miro\_cv Node](#start-miro_cv-node)
 - [Contribution](#contribution)
   - [1. Background](#1-background)
   - [2. Methods](#2-methods)
@@ -78,6 +79,12 @@ The master branch is the official released version, and the core version is the 
 1. a MiRo robot
 2. a Laptop with GPU card is better
 
+## Start miro_cv Node
+```
+$ cd your_workspace && catkin_make
+$ source devel/setup.bash
+$ rosrun miro_cv client_control_module.py
+```
 
 
 # Contribution
