@@ -1,6 +1,6 @@
 # MiRo-CV-System
 
-This is my first version of an bio-inspired visual system which is based on OpenCV APIs and ANN, and the final aim of this project is intercepting a moving target. I pre-defined **three targets**, named pedestrians, MiRo robots and MiRo toy balls. In total, there are three scenarios for different deploying situations, like on-board;  off-board and in a simulator (Gazebo). Some codes are inspired from **code samples** in the MDK-2019 version. Thanks for their brilliant work on building MiRo robots. I am also one of the big fan loving biomimetic robots. Link: http://labs.consequentialrobotics.com/miro-e/docs/index.php?page=Introduction
+This is my first version of an bio-inspired visual system which is based on OpenCV APIs and ANN, and the final aim of this project is intercepting a moving target. I pre-defined **three targets**, named pedestrians, MiRo robots and MiRo toy balls. In total, there are three scenarios for different deploying situations, like on-board;  off-board and in a simulator (Gazebo). Some codes are inspired from **code samples** in the MDK-2019 version. Thanks for their brilliant work on building MiRo robots. I am also one of the big fan loving [biomimetic ](https://en.wikipedia.org/wiki/Biomimetics) robots. Link: http://labs.consequentialrobotics.com/miro-e/docs/index.php?page=Introduction
 
 **Demo1**(intercepting_ball):
 
@@ -29,7 +29,6 @@ The master branch is the official released version, and the core version is the 
   - [Software](#software)
   - [Hardware](#hardware)
   - [Start miro\_cv Node](#start-miro_cv-node)
-- [Contribution](#contribution)
   - [1. Background](#1-background)
   - [2. Methods](#2-methods)
     - [2.1 Braitenberg vehicles](#21-braitenberg-vehicles)
@@ -54,6 +53,7 @@ The master branch is the official released version, and the core version is the 
   - [4. Summary](#4-summary)
   - [TODO](#todo)
   - [More about MiRo Robot](#more-about-miro-robot)
+  - [Contribution](#contribution)
   - [References](#references)
 
 # News
@@ -85,13 +85,6 @@ $ cd your_workspace && catkin_make
 $ source devel/setup.bash
 $ rosrun miro_cv client_control_module.py
 ```
-
-
-# Contribution
-
-Any contributions are welcomed, if you love playing with MiRo robots, you can use this repo as a good start of applying computer vision algorithms on a [Biomimetic ](https://en.wikipedia.org/wiki/Biomimetics) robot.
-
-
 
 ## 1. Background
 
@@ -212,6 +205,9 @@ All codes are implemented based on doing self-learning roughly in 5 months. Nece
 
 If you want to know more about this biomimetic MiRo robot, please click this [link](https://www.miro-e.com/robot) to find more on their official websites.
 
+## Contribution
+
+Any contributions are welcomed, if you love playing with MiRo robots, you can use this repo as a good start of applying computer vision algorithms on a [Biomimetic ](https://en.wikipedia.org/wiki/Biomimetics) robot.
 
 
 ## References
