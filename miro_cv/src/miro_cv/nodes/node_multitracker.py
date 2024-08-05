@@ -4,12 +4,12 @@ import cv2 as cv
 import sys
 import rospy
 import time
-import node_path_planning
+import miro_cv.nodes.node_path_planning
 
 from random import randint
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import CompressedImage
-from node_direction_keeper import *
+from miro_cv.nodes.node_direction_keeper import *
 from geometry_msgs.msg import Pose2D,Vector3
 
 #This class provide a multitracking method, we have three targets for this project's aim
