@@ -1,0 +1,6 @@
+<launch>
+    <rosparam  command="load" file="$(find miro_cv)/config/params.yaml"/>  
+
+    <node name="main_module" pkg="miro_cv" type="main_module.py" respawn="false" output="screen" >
+    </node>
+</launch>

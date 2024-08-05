@@ -52,13 +52,13 @@ import matplotlib.pyplot as plt
 
 class MainNode:
 
-    def __init__(self, name):
+    def __init__(self, name, cascade_path):
         # initial setup of the robot name, you need to source the mdk/setup.bash before runing
         topic_root = "/" + name + "/"
         self.is_activated = True # The default safety range control is opened, so the default value is True.
         #Initinalize some essential instances.
         self.kc = Kc_init(topic_root)
-        self.detector = NormalDetector(topic_root)
+        self.detector = NormalDetector(topic_root, cascade_path)
         self.path = PathPlanner(topic_root)
         self.tracker = Tracker(topic_root)
         self.multiTracker = MultiTracker(topic_root)
@@ -198,8 +198,9 @@ if __name__ == "__main__":
     pars = pars.CorePars() # init the miro_robot_name using default value
     topic_base_name = pars.ros.robot_name
     rospy.init_node(topic_base_name + "_client_demo") # log_level=self.pars.ros.log_level
+    cascade_pth = rospy.get_param("/cascade_path")
     print ("<<<<Starting the " + topic_base_name + "_client_demo !!!>>>>")
-    main = MainNode(topic_base_name)
+    main = MainNode(topic_base_name, cascade_pth)
     main.init_kinematic()# Initiate the kinematic status of MiRo
 
     # ######################################################################## #
